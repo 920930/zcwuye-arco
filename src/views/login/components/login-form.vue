@@ -26,83 +26,83 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { Message } from '@arco-design/web-vue';
-  import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
-  import { useI18n } from 'vue-i18n';
-  // import { useStorage } from '@vueuse/core';
-  import { useUserStore } from '@/store';
-  import useLoading from '@/hooks/loading';
-  import type { LoginData } from '@/api/user';
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { Message } from '@arco-design/web-vue';
+import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
+import { useI18n } from 'vue-i18n';
+// import { useStorage } from '@vueuse/core';
+import { useUserStore } from '@/store';
+import useLoading from '@/hooks/loading';
+import type { LoginData } from '@/api/user';
 
-  const router = useRouter();
-  const { t } = useI18n();
-  const errorMessage = ref('');
-  const { loading, setLoading } = useLoading();
-  const userStore = useUserStore();
+const router = useRouter();
+const { t } = useI18n();
+const errorMessage = ref('');
+const { loading, setLoading } = useLoading();
+const userStore = useUserStore();
 
-  const userInfo = reactive({
-    phone: '',
-    password: '',
-  });
+const userInfo = reactive({
+  phone: '18081990075',
+  password: '123456',
+});
 
-  const handleSubmit = async ({ errors, values }: { errors: Record<string, ValidatedError> | undefined; values: Record<string, any> }) => {
-    if (loading.value) return;
-    if (!errors) {
-      setLoading(true);
-      try {
-        await userStore.login(values as LoginData);
-        const { redirect, ...othersQuery } = router.currentRoute.value.query;
-        router.push({
-          name: (redirect as string) || 'Workplace',
-          query: {
-            ...othersQuery,
-          },
-        });
-        Message.success(t('login.form.login.success'));
-        // 实际生产环境需要进行加密存储。
-      } catch (err) {
-        errorMessage.value = (err as Error).message;
-      } finally {
-        setLoading(false);
-      }
+const handleSubmit = async ({ errors, values }: { errors: Record<string, ValidatedError> | undefined; values: Record<string, any> }) => {
+  if (loading.value) return;
+  if (!errors) {
+    setLoading(true);
+    try {
+      await userStore.login(values as LoginData);
+      const { redirect, ...othersQuery } = router.currentRoute.value.query;
+      router.push({
+        name: (redirect as string) || 'Workplace',
+        query: {
+          ...othersQuery,
+        },
+      });
+      Message.success(t('login.form.login.success'));
+      // 实际生产环境需要进行加密存储。
+    } catch (err) {
+      errorMessage.value = (err as Error).message;
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+};
 </script>
 
 <style lang="less" scoped>
-  .login-form {
-    &-wrapper {
-      width: 320px;
-    }
-
-    &-title {
-      color: var(--color-text-1);
-      font-weight: 500;
-      font-size: 24px;
-      line-height: 32px;
-    }
-
-    &-sub-title {
-      color: var(--color-text-3);
-      font-size: 16px;
-      line-height: 24px;
-    }
-
-    &-error-msg {
-      height: 32px;
-      color: rgb(var(--red-6));
-      line-height: 32px;
-    }
-
-    &-password-actions {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    &-register-btn {
-      color: var(--color-text-3) !important;
-    }
+.login-form {
+  &-wrapper {
+    width: 320px;
   }
+
+  &-title {
+    color: var(--color-text-1);
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  &-sub-title {
+    color: var(--color-text-3);
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  &-error-msg {
+    height: 32px;
+    color: rgb(var(--red-6));
+    line-height: 32px;
+  }
+
+  &-password-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-register-btn {
+    color: var(--color-text-3) !important;
+  }
+}
 </style>

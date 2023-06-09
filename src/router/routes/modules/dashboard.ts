@@ -22,6 +22,15 @@ const DASHBOARD: AppRouteRecordRaw = {
         roles: ['*'],
       },
     },
+    {
+      path: 'company',
+      name: 'Company',
+      component: () => import('@/views/company/index.vue'),
+      meta: {
+        locale: 'menu.company',
+        requiresAuth: true,
+      },
+    },
   ],
 };
 

@@ -5,12 +5,13 @@ module.exports = {
   singleQuote: true,
   quoteProps: 'consistent',
   htmlWhitespaceSensitivity: 'strict',
-  vueIndentScriptAndStyle: true,
+  vueIndentScriptAndStyle: false,
+  endOfLine: 'crlf',
 };
 
 //此处的规则供参考，其中多半其实都是默认值，可以根据个人习惯改写
 // module.exports = {
-//   printWidth: 80, //单行长度
+//   printWidth: 250, //单行长度
 //   tabWidth: 2, //缩进长度
 //   useTabs: false, //使用空格代替tab缩进
 //   semi: true, //句末使用分号
@@ -26,6 +27,6 @@ module.exports = {
 //   proseWrap: 'preserve', //不知道怎么翻译
 //   htmlWhitespaceSensitivity: 'ignore', //对HTML全局空白不敏感
 //   vueIndentScriptAndStyle: false, //不对vue中的script及style标签缩进
-//   endOfLine: 'lf', //结束行形式
+//   endOfLine: 'auto', //结束行形式
 //   embeddedLanguageFormatting: 'auto', //对引用代码进行格式化
 // };
