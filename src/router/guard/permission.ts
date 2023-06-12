@@ -11,6 +11,7 @@ export default function setupPermissionGuard(router: Router) {
     const appStore = useAppStore();
     const userStore = useUserStore();
     const Permission = usePermission();
+
     const permissionsAllow = Permission.accessRouter(to);
     if (appStore.menuFromServer) {
       // 针对来自服务端的菜单配置进行处理
@@ -18,11 +19,8 @@ export default function setupPermissionGuard(router: Router) {
 
       // 根据需要自行完善来源于服务端的菜单配置的permission逻辑
       // Refine the permission logic from the server's menu configuration as needed
-      if (
-        !appStore.appAsyncMenus.length &&
-        !WHITE_LIST.find((el) => el.name === to.name)
-      ) {
-        await appStore.fetchServerMenuConfig();
+      if (!appStore.appAsyncMenus.length && !WHITE_LIST.find((el) => el.name === to.name)) {
+        await appStore.fetchServerMenuConfig(userStore.company[0].id);
       }
       const serverMenuConfig = [...appStore.appAsyncMenus, ...WHITE_LIST];
 
@@ -32,9 +30,7 @@ export default function setupPermissionGuard(router: Router) {
         if (element?.name === to.name) exist = true;
 
         if (element?.children) {
-          serverMenuConfig.push(
-            ...(element.children as unknown as RouteRecordNormalized[])
-          );
+          serverMenuConfig.push(...(element.children as unknown as RouteRecordNormalized[]));
         }
       }
       if (exist && permissionsAllow) {
@@ -44,9 +40,7 @@ export default function setupPermissionGuard(router: Router) {
       // eslint-disable-next-line no-lonely-if
       if (permissionsAllow) next();
       else {
-        const destination =
-          Permission.findFirstPermissionRoute(appRoutes, userStore.role) ||
-          NOT_FOUND;
+        const destination = Permission.findFirstPermissionRoute(appRoutes, userStore.role) || NOT_FOUND;
         next(destination);
       }
     }

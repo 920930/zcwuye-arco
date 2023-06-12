@@ -1,19 +1,13 @@
-export type RoleType = '' | '*' | 'admin' | 'user';
+export type RoleType = '' | '*' | 'super' | 'admin' | 'user';
 export interface UserState {
+  id?: number;
   name?: string;
   avatar?: string;
   job?: string;
-  organization?: string;
-  location?: string;
-  email?: string;
-  introduction?: string;
-  personalWebsite?: string;
   jobName?: string;
-  organizationName?: string;
-  locationName?: string;
+  company: { id: number; name: string }[];
+  companyId?: number;
+  introduction?: string;
   phone?: string;
-  registrationDate?: string;
-  accountId?: string;
-  certification?: number;
   role: RoleType;
 }

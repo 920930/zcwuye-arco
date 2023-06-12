@@ -23,11 +23,11 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
-      path: 'company',
-      name: 'Company',
-      component: () => import('@/views/company/index.vue'),
+      path: 'user',
+      name: 'User',
+      component: () => import('@/views/dashboard/user/index.vue'),
       meta: {
-        locale: 'menu.company',
+        locale: '商户列表',
         requiresAuth: true,
       },
     },

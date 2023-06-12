@@ -43,14 +43,14 @@ const useAppStore = defineStore('app', {
     toggleMenu(value: boolean) {
       this.hideMenu = value;
     },
-    async fetchServerMenuConfig() {
+    async fetchServerMenuConfig(companyId = 1) {
       try {
         Notification.info({
           id: 'menuNotice', // Keep the instance id the same
           content: 'loading',
           closable: true,
         });
-        const { data } = await getMenuList();
+        const { data } = await getMenuList(companyId);
         this.serverMenu = data;
         Notification.success({
           id: 'menuNotice',

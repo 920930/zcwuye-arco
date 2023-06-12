@@ -7,21 +7,14 @@ import useAppStore from '../app';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
+    id: undefined,
     name: undefined,
     avatar: undefined,
     job: undefined,
-    organization: undefined,
-    location: undefined,
-    email: undefined,
+    company: [],
+    companyId: undefined,
     introduction: undefined,
-    personalWebsite: undefined,
-    jobName: undefined,
-    organizationName: undefined,
-    locationName: undefined,
     phone: undefined,
-    registrationDate: undefined,
-    accountId: undefined,
-    certification: undefined,
     role: '',
   }),
 
@@ -40,7 +33,10 @@ const useUserStore = defineStore('user', {
     },
     // Set user's information
     setInfo(partial: Partial<UserState>) {
-      this.$patch(partial);
+      const { company } = partial;
+      const companyId = company ? company[0].id : undefined;
+      const ret = { ...partial, companyId };
+      this.$patch(ret);
     },
 
     // Reset user's information
@@ -51,14 +47,15 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      this.setInfo(res.data);
+      this.setInfo(res);
     },
 
     // Login
     async login(loginForm: LoginData) {
       try {
         const res = await userLogin(loginForm);
-        setToken(res.data.token);
+        console.log(res);
+        // setToken(res.token);
       } catch (err) {
         clearToken();
         throw err;

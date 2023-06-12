@@ -4,11 +4,8 @@
       <a-space>
         <img alt="logo" src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image" />
         <a-typography-title v-show="appStore.device === 'desktop'" :style="{ margin: 0, fontSize: '18px' }" :heading="5"> Arco Pro </a-typography-title>
-        <a-select default-value="华阳">
-          <a-option>华阳</a-option>
-          <a-option>新红</a-option>
-          <a-option>新福</a-option>
-          <a-option>家福</a-option>
+        <a-select :default-value="userStore.companyId" @change="selectFn">
+          <a-option v-for="item in userStore.company" :key="item.id" :value="item.id" :label="item.name" />
         </a-select>
         <icon-menu-fold v-if="!topMenu && appStore.device === 'mobile'" style="font-size: 22px; cursor: pointer" @click="toggleDrawerMenu" />
       </a-space>
@@ -154,12 +151,8 @@ const { logout } = useUser();
 const { changeLocale, currentLocale } = useLocale();
 const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
 const locales = [...LOCALE_OPTIONS];
-const avatar = computed(() => {
-  return userStore.avatar;
-});
-const theme = computed(() => {
-  return appStore.theme;
-});
+const avatar = computed(() => userStore.avatar);
+const theme = computed(() => appStore.theme);
 const topMenu = computed(() => appStore.topMenu && appStore.menu);
 const isDark = useDark({
   selector: 'body',
@@ -205,6 +198,10 @@ const switchRoles = async () => {
   Message.success(res as string);
 };
 const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
+
+const selectFn = (id: any) => {
+  appStore.fetchServerMenuConfig(id);
+};
 </script>
 
 <style scoped lang="less">

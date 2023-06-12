@@ -6,7 +6,7 @@ module.exports = {
   quoteProps: 'consistent',
   htmlWhitespaceSensitivity: 'strict',
   vueIndentScriptAndStyle: false,
-  endOfLine: 'crlf',
+  endOfLine: 'auto',
 };
 
 //此处的规则供参考，其中多半其实都是默认值，可以根据个人习惯改写

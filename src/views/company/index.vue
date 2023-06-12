@@ -1,10 +1,7 @@
 <template>
   <section>
-    <div>{{ dever }}</div>
+    <div>123</div>
   </section>
 </template>
 
-<script lang="ts" setup>
-import { useReSive } from '@/hooks/cesi';
-const { dever } = useReSive();
-</script>
+<script lang="ts" setup></script>
