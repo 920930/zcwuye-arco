@@ -25,6 +25,7 @@ export default function setupUserLoginInfoGuard(router: Router) {
             } as LocationQueryRaw,
           });
         }
+        next();
       }
     } else {
       if (to.name === 'login') {

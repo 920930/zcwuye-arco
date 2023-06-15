@@ -1,11 +1,5 @@
 <template>
-  <a-card
-    class="general-card"
-    :title="$t('workplace.docs')"
-    :header-style="{ paddingBottom: 0 }"
-    :body-style="{ paddingTop: 0 }"
-    style="height: 166px"
-  >
+  <a-card class="general-card" :title="$t('workplace.docs')" :header-style="{ paddingBottom: 0 }" :body-style="{ paddingTop: 0 }" style="height: 166px">
     <template #extra>
       <a-link>{{ $t('workplace.viewMore') }}</a-link>
     </template>
@@ -35,8 +29,8 @@
 </template>
 
 <style lang="less" scoped>
-  .arco-card-body .arco-link {
-    margin: 10px 0;
-    color: rgb(var(--gray-8));
-  }
+.arco-card-body .arco-link {
+  margin: 10px 0;
+  color: rgb(var(--gray-8));
+}
 </style>

@@ -11,17 +11,17 @@ export interface LoginRes {
   token: string;
 }
 export const login = (data: LoginData) => {
-  return http.post<LoginRes>('/user/login', data);
+  return http.post<string>('/auth/login', data);
 };
 
 export async function logout() {
-  return http.post<LoginRes>('/user/logout');
+  return http.post<LoginRes>('/auth/logout');
 }
 
 export function getUserInfo() {
-  return http.post<UserState>('/user/info');
+  return http.get<UserState>('/adminer/info');
 }
 
 export function getMenuList(companyId: number) {
-  return http.post<RouteRecordNormalized[]>(`/user/menu?companyId=${companyId}`);
+  return http.get<RouteRecordNormalized[]>(`/company/menu?companyId=${companyId}`);
 }

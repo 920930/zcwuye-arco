@@ -11,7 +11,7 @@ const useUserStore = defineStore('user', {
     name: undefined,
     avatar: undefined,
     job: undefined,
-    company: [],
+    companies: [],
     companyId: undefined,
     introduction: undefined,
     phone: undefined,
@@ -33,8 +33,8 @@ const useUserStore = defineStore('user', {
     },
     // Set user's information
     setInfo(partial: Partial<UserState>) {
-      const { company } = partial;
-      const companyId = company ? company[0].id : undefined;
+      const { companies } = partial;
+      const companyId = companies ? companies[0].id : undefined;
       const ret = { ...partial, companyId };
       this.$patch(ret);
     },
@@ -53,9 +53,8 @@ const useUserStore = defineStore('user', {
     // Login
     async login(loginForm: LoginData) {
       try {
-        const res = await userLogin(loginForm);
-        console.log(res);
-        // setToken(res.token);
+        const token = await userLogin(loginForm);
+        setToken(token);
       } catch (err) {
         clearToken();
         throw err;

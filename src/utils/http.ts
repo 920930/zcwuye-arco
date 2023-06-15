@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { Message } from '@arco-design/web-vue';
 import { getToken, setToken, clearToken } from './auth';
 
 const instance = axios.create({
@@ -28,9 +29,13 @@ instance.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    const { data } = error.response;
     // 对响应错误做点什么
     if (error.response.status === 401) {
       clearToken();
+    }
+    if (error.response.status === 400 || error.response.status === 403) {
+      Message.error(data.message);
     }
     return Promise.reject(error);
   }
@@ -38,7 +43,7 @@ instance.interceptors.response.use(
 type TMethod = 'get' | 'post' | 'put' | 'delete';
 const http = async <T>(method: TMethod, url: string, params?: any, config?: AxiosRequestConfig) => {
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise<T>(async (resolve) => {
+  return new Promise<T>(async (resolve, reject) => {
     try {
       if (method === 'get') {
         const { data } = await instance.get<T>(url, { params, ...config });
@@ -53,7 +58,7 @@ const http = async <T>(method: TMethod, url: string, params?: any, config?: Axio
         resolve(data);
       }
     } catch (error) {
-      // reject(error);
+      reject(error);
     }
   });
 };

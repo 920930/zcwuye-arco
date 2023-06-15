@@ -5,7 +5,7 @@
         <img alt="logo" src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image" />
         <a-typography-title v-show="appStore.device === 'desktop'" :style="{ margin: 0, fontSize: '18px' }" :heading="5"> Arco Pro </a-typography-title>
         <a-select :default-value="userStore.companyId" @change="selectFn">
-          <a-option v-for="item in userStore.company" :key="item.id" :value="item.id" :label="item.name" />
+          <a-option v-for="item in userStore.companies" :key="item.id" :value="item.id" :label="item.name" />
         </a-select>
         <icon-menu-fold v-if="!topMenu && appStore.device === 'mobile'" style="font-size: 22px; cursor: pointer" @click="toggleDrawerMenu" />
       </a-space>

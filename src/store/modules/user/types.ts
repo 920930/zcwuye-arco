@@ -5,7 +5,7 @@ export interface UserState {
   avatar?: string;
   job?: string;
   jobName?: string;
-  company: { id: number; name: string }[];
+  companies: { id: number; name: string }[];
   companyId?: number;
   introduction?: string;
   phone?: string;
