@@ -138,7 +138,7 @@
 import { computed, ref, inject } from 'vue';
 import { Message } from '@arco-design/web-vue';
 import { useDark, useToggle, useFullscreen } from '@vueuse/core';
-import { useAppStore, useUserStore } from '@/store';
+import { useAppStore, useUserStore, useTabBarStore } from '@/store';
 import { LOCALE_OPTIONS } from '@/locale';
 import useLocale from '@/hooks/locale';
 import useUser from '@/hooks/user';
@@ -147,6 +147,7 @@ import MessageBox from '../message-box/index.vue';
 
 const appStore = useAppStore();
 const userStore = useUserStore();
+const tabbarStore = useTabBarStore();
 const { logout } = useUser();
 const { changeLocale, currentLocale } = useLocale();
 const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
@@ -200,7 +201,9 @@ const switchRoles = async () => {
 const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
 const selectFn = (id: any) => {
+  userStore.companyId = id;
   appStore.fetchServerMenuConfig(id);
+  tabbarStore.resetTabList();
 };
 </script>
 

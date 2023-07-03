@@ -18,3 +18,37 @@ export interface AppState {
   serverMenu: RouteRecordNormalized[];
   [key: string]: unknown;
 }
+
+export interface IMenu {
+  id: number;
+  name: string;
+  company: number[];
+  meta: {
+    locale: string;
+    icon?: string;
+    order?: number;
+    requiresAuth?: boolean;
+    roles?: string[];
+  };
+  children?: IMenu[];
+  parent?: IMenu;
+}
+
+export interface IRole {
+  id: number;
+  title: string;
+  name: string;
+}
+
+export interface ICompany {
+  id: number;
+  name: string;
+  dong: string;
+  qu: string;
+}
+
+export interface IOptions {
+  label: string;
+  value: number;
+  children?: IOptions[];
+}

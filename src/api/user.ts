@@ -1,6 +1,6 @@
 import http from '@/utils/http';
-import type { RouteRecordNormalized } from 'vue-router';
 import { UserState } from '@/store/modules/user/types';
+import { IMenu } from '@/store/modules/app/types';
 
 export interface LoginData {
   phone: string;
@@ -22,6 +22,18 @@ export function getUserInfo() {
   return http.get<UserState>('/adminer/info');
 }
 
-export function getMenuList(companyId: number) {
-  return http.get<RouteRecordNormalized[]>(`/company/menu?companyId=${companyId}`);
+export function getMenuList<T>(companyId?: number) {
+  let url = '/menu';
+  url += companyId ? `?companyId=${companyId}` : '';
+  return http.get<T>(url);
 }
+
+export const getRoleList = <T>() => {
+  return http.get<T>('/role');
+};
+
+export const getCompanyList = <T>() => http.get<T>('/company');
+
+export const postOrPutMenu = <T>(data: IMenu) => {
+  return data.id ? http.put<T>(`/menu/${data.id}`, data) : http.post<T>('/menu', data);
+};
