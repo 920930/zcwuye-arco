@@ -172,6 +172,7 @@ const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   if (errors) return;
   modal.visible = false;
   handleCancel();
+  values.parent = values.parent === undefined ? null : values.parent;
   await postOrPutMenu(values);
   getMenuBtn();
   appStore.fetchServerMenuConfig(userStore.companyId);
