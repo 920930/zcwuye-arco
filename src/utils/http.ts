@@ -35,37 +35,40 @@ instance.interceptors.response.use(
       clearToken();
     }
     if (error.response.status === 400 || error.response.status === 403) {
-      Message.error(data.message);
+      if (Array.isArray(data.message)) Message.error(data.message[0]);
+      else Message.error(data.message);
     }
     return Promise.reject(error);
   }
 );
 type TMethod = 'get' | 'post' | 'put' | 'delete';
-const http = async <T>(method: TMethod, url: string, params?: any, config?: AxiosRequestConfig) => {
+const http = async <T>(method: TMethod, url: string, params?: any, config?: AxiosRequestConfig | boolean) => {
+  let res = { params };
+  if (typeof config !== 'boolean') res = { params, ...config };
   // eslint-disable-next-line no-async-promise-executor
   return new Promise<T>(async (resolve, reject) => {
     try {
       if (method === 'get') {
-        const { data } = await instance.get<T>(url, { params, ...config });
+        const { data } = await instance.get<T>(url, res);
         resolve(data);
       }
       if (method === 'delete') {
-        const { data } = await instance.delete<T>(url, config);
+        const { data } = await instance.delete<T>(url, res);
         resolve(data);
       }
       if (method === 'put' || method === 'post') {
-        const { data } = await instance[method]<T>(url, params, config);
+        const { data } = await instance[method]<T>(url, params, res);
         resolve(data);
       }
     } catch (error) {
-      reject(error);
+      if (typeof config === 'boolean' && config) reject(error);
     }
   });
 };
 
-http.get = <T>(url: string, params?: any, config?: AxiosRequestConfig) => http<T>('get', url, params, config);
-http.post = <T>(url: string, body?: any, config?: AxiosRequestConfig) => http<T>('post', url, body, config);
-http.put = <T>(url: string, body?: any, config?: AxiosRequestConfig) => http<T>('put', url, body, config);
-http.delete = <T>(url: string, config?: AxiosRequestConfig) => http<T>('delete', url, config);
+http.get = <T>(url: string, params?: any, config?: AxiosRequestConfig | boolean) => http<T>('get', url, params, config);
+http.post = <T>(url: string, body?: any, config?: AxiosRequestConfig | boolean) => http<T>('post', url, body, config);
+http.put = <T>(url: string, body?: any, config?: AxiosRequestConfig | boolean) => http<T>('put', url, body, config);
+http.delete = <T>(url: string, config?: AxiosRequestConfig | boolean) => http<T>('delete', url, config);
 
 export default http;

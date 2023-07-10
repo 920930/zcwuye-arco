@@ -45,6 +45,8 @@ export interface ICompany {
   name: string;
   dong: string;
   qu: string;
+  qutype: number;
+  state: boolean;
 }
 
 export interface IOptions {

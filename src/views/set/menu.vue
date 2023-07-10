@@ -60,11 +60,11 @@
           </a-select>
         </a-form-item>
         <a-form-item field="parent" label="父级路由">
-          <a-cascader v-model="modal.form.parent" :options="data.menuOption" check-strictly placeholder="请选择父级栏目 可不选" allow-clear @clear="clearCascader" />
+          <a-cascader v-model="modal.form.parent" :options="data.menuOption" check-strictly placeholder="请选择父级栏目 可不选" allow-clear />
         </a-form-item>
         <a-form-item>
           <a-space>
-            <a-button>Reset</a-button>
+            <a-button @click="formRef.resetFields()">重置</a-button>
             <a-button html-type="submit" type="primary">提交</a-button>
           </a-space>
         </a-form-item>
@@ -75,7 +75,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getMenuList, getRoleList, getCompanyList, postOrPutMenu } from '@/api/user';
+import { getMenuList, getRoleList, getCompanyList, menuPostOrPut } from '@/api/user';
 import { useUserStore, useAppStore } from '@/store';
 import type { IMenu, IRole, ICompany, IOptions } from '@/store/modules/app/types';
 import { menuToOption } from '@/utils';
@@ -154,43 +154,28 @@ const editBtn = (record: IMenu) => {
 };
 // 重置表单数据
 const handleCancel = () => {
+  modal.visible = false;
   formRef.value.clearValidate();
-  modal.form = {
-    id: 0,
-    name: '',
-    meta: {
-      locale: '',
-      icon: '',
-      order: 0,
-      requiresAuth: true,
-    },
-    company: [],
-    parent: undefined,
-  };
+  formRef.value.resetFields();
+  // modal.form = {
+  //   id: 0,
+  //   name: '',
+  //   meta: {
+  //     locale: '',
+  //     icon: '',
+  //     order: 0,
+  //     requiresAuth: true,
+  //   },
+  //   company: [],
+  //   parent: undefined,
+  // };
 };
 const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   if (errors) return;
-  modal.visible = false;
-  handleCancel();
   values.parent = values.parent === undefined ? null : values.parent;
-  await postOrPutMenu(values);
+  await menuPostOrPut(values);
+  handleCancel();
   getMenuBtn();
   appStore.fetchServerMenuConfig(userStore.companyId);
 };
-
-const clearCascader = () => {
-  formRef.value.setFields({
-    parent: { value: null },
-  });
-};
 </script>
-
-<style lang="less" scoped>
-.m-20 {
-  margin: 20px;
-}
-
-.mb-10 {
-  margin-bottom: 10px;
-}
-</style>

@@ -24,3 +24,13 @@ const locale = computed(() => {
   }
 });
 </script>
+
+<style lang="less">
+.m-20 {
+  margin: 20px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+</style>
