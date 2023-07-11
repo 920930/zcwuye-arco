@@ -48,3 +48,10 @@ export const getCompanyList = <T>() => http.get<T>('/company');
 export const companyPutOrPost = <T>(data: ICompany) => {
   return data.id ? http.put<T>(`/company/${data.id}`, data) : http.post<T>('/company', data);
 };
+
+// 员工 - 列表
+export const getAdminerList = <T>() => http.get<T>('/adminer');
+// 员工 - 编辑/新增
+export const adminerPutOrPost = <T>(data: ICompany) => {
+  return data.id ? http.patch<T>(`/adminer/${data.id}`, data) : http.post<T>('/adminer', data);
+};

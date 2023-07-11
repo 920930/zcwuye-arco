@@ -39,6 +39,15 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
       },
     },
+    {
+      path: 'adminer',
+      name: 'adminer',
+      component: () => import('@/views/set/adminer.vue'),
+      meta: {
+        locale: '员工列表',
+        requiresAuth: true,
+      },
+    },
   ],
 };
 

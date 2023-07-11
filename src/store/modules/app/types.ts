@@ -49,6 +49,17 @@ export interface ICompany {
   state: boolean;
 }
 
+export interface IAdminer {
+  id: number;
+  name: string;
+  phone: string;
+  password?: string;
+  avatar: string;
+  state: boolean;
+  role: IRole;
+  companies: ICompany[];
+}
+
 export interface IOptions {
   label: string;
   value: number;

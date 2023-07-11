@@ -41,7 +41,7 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-type TMethod = 'get' | 'post' | 'put' | 'delete';
+type TMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 const http = async <T>(method: TMethod, url: string, params?: any, config?: AxiosRequestConfig | boolean) => {
   let res = { params };
   if (typeof config !== 'boolean') res = { params, ...config };
@@ -56,7 +56,7 @@ const http = async <T>(method: TMethod, url: string, params?: any, config?: Axio
         const { data } = await instance.delete<T>(url, res);
         resolve(data);
       }
-      if (method === 'put' || method === 'post') {
+      if (method === 'put' || method === 'patch' || method === 'post') {
         const { data } = await instance[method]<T>(url, params, res);
         resolve(data);
       }
@@ -69,6 +69,7 @@ const http = async <T>(method: TMethod, url: string, params?: any, config?: Axio
 http.get = <T>(url: string, params?: any, config?: AxiosRequestConfig | boolean) => http<T>('get', url, params, config);
 http.post = <T>(url: string, body?: any, config?: AxiosRequestConfig | boolean) => http<T>('post', url, body, config);
 http.put = <T>(url: string, body?: any, config?: AxiosRequestConfig | boolean) => http<T>('put', url, body, config);
+http.patch = <T>(url: string, body?: any, config?: AxiosRequestConfig | boolean) => http<T>('patch', url, body, config);
 http.delete = <T>(url: string, config?: AxiosRequestConfig | boolean) => http<T>('delete', url, config);
 
 export default http;

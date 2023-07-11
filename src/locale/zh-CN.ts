@@ -14,6 +14,7 @@ export default {
   'menu.server.company': '公司列表',
   'menu.server.menu': '菜单列表',
   'menu.server.role': '角色列表',
+  'menu.server.adminer': '员工列表',
   'menu.server.zhican': '资产管理',
   'menu.server.room': '商铺列表',
   'menu.server.ad': '广告位列表',
