@@ -60,6 +60,8 @@ export interface IAdminer {
   companies: ICompany[];
 }
 
+export type IUser = Pick<IAdminer, 'id' | 'name' | 'phone' | 'state' | 'companies'>;
+
 export interface IOptions {
   label: string;
   value: number;

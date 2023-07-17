@@ -8,8 +8,6 @@ const DASHBOARD: AppRouteRecordRaw = {
   meta: {
     locale: 'menu.server.dashboard',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
   },
   children: [
     {
@@ -19,7 +17,15 @@ const DASHBOARD: AppRouteRecordRaw = {
       meta: {
         locale: 'menu.server.workplace',
         requiresAuth: true,
-        roles: ['*'],
+      },
+    },
+    {
+      path: 'user',
+      name: 'user',
+      component: () => import('@/views/dashboard/user/index.vue'),
+      meta: {
+        locale: 'menu.server.user',
+        requiresAuth: true,
       },
     },
   ],
