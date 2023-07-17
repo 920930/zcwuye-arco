@@ -9,7 +9,7 @@
         <a-button>重置</a-button>
       </a-space>
     </section>
-    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true }">
+    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true }" @page-change="pageChange">
       <template #columns>
         <a-table-column title="Id" data-index="id" />
         <a-table-column title="姓名" data-index="name" />
@@ -99,8 +99,8 @@ const data = reactive<{ adminers: { count: number; data: IUser[] }; companies: {
   },
   companies: [],
 });
-const getAdminer = async () => {
-  const [ret, count] = await userList<[IUser[], number]>();
+const getAdminer = async (page = 1, size = 10) => {
+  const [ret, count] = await userList<[IUser[], number]>(page, size);
   data.adminers.count = count;
   data.adminers.data = ret;
 };
@@ -141,6 +141,11 @@ const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   await userPostOrPut(values);
   handleCancel();
   getAdminer();
+};
+
+// 分页加载
+const pageChange = (page: number) => {
+  getAdminer(page);
 };
 </script>
 
