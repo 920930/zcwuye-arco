@@ -23,5 +23,5 @@ export function getUserInfo() {
 }
 
 export function getMenuList(companyId: number) {
-  return http.get<RouteRecordNormalized[]>(`/company/menu?companyId=${companyId}`);
+  return http.get<RouteRecordNormalized[]>(`/menu?companyId=${companyId}`);
 }
