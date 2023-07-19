@@ -1,6 +1,6 @@
 import http from '@/utils/http';
-import type { RouteRecordNormalized } from 'vue-router';
 import { UserState } from '@/store/modules/user/types';
+import { IMenu, ICompany, IRole } from '@/store/modules/app/types';
 
 export interface LoginData {
   phone: string;
@@ -11,7 +11,7 @@ export interface LoginRes {
   token: string;
 }
 export const login = (data: LoginData) => {
-  return http.post<string>('/auth/login', data);
+  return http.post<string>('/auth/login', data, true);
 };
 
 export async function logout() {
@@ -19,9 +19,39 @@ export async function logout() {
 }
 
 export function getUserInfo() {
-  return http.get<UserState>('/adminer/info');
+  return http.get<UserState>('/adminer/info', true);
 }
 
-export function getMenuList(companyId: number) {
-  return http.get<RouteRecordNormalized[]>(`/menu?companyId=${companyId}`);
+// 菜单 - 列表
+export function getMenuList<T>(companyId?: number) {
+  let url = '/menu';
+  url += companyId ? `?companyId=${companyId}` : '';
+  return http.get<T>(url);
 }
+// 菜单 - 编辑或新增
+export const menuPostOrPut = <T>(data: IMenu) => {
+  return data.id ? http.put<T>(`/menu/${data.id}`, data) : http.post<T>('/menu', data);
+};
+
+// 角色 - 列表
+export const getRoleList = <T>() => {
+  return http.get<T>('/role');
+};
+// 角色 - 编辑或新增
+export const rolePostOrPut = <T>(data: IRole) => {
+  return data.id ? http.put<T>(`/role/${data.id}`, data) : http.post<T>('/role', data);
+};
+
+// 公司 - 列表
+export const getCompanyList = <T>() => http.get<T>('/company');
+// 公司 - 编辑/新增
+export const companyPutOrPost = <T>(data: ICompany) => {
+  return data.id ? http.put<T>(`/company/${data.id}`, data) : http.post<T>('/company', data);
+};
+
+// 员工 - 列表
+export const getAdminerList = <T>() => http.get<T>('/adminer');
+// 员工 - 编辑/新增
+export const adminerPutOrPost = <T>(data: ICompany) => {
+  return data.id ? http.patch<T>(`/adminer/${data.id}`, data) : http.post<T>('/adminer', data);
+};

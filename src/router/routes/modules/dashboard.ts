@@ -6,10 +6,8 @@ const DASHBOARD: AppRouteRecordRaw = {
   name: 'dashboard',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: 'menu.dashboard',
+    locale: 'menu.server.dashboard',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
   },
   children: [
     {
@@ -17,17 +15,16 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'Workplace',
       component: () => import('@/views/dashboard/workplace/index.vue'),
       meta: {
-        locale: 'menu.dashboard.workplace',
+        locale: 'menu.server.workplace',
         requiresAuth: true,
-        roles: ['*'],
       },
     },
     {
       path: 'user',
-      name: 'User',
+      name: 'user',
       component: () => import('@/views/dashboard/user/index.vue'),
       meta: {
-        locale: '商户列表',
+        locale: 'menu.server.user',
         requiresAuth: true,
       },
     },

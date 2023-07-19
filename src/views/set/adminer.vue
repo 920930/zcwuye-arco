@@ -1,21 +1,15 @@
 <template>
   <section class="m-20">
-    <section class="top">
-      <a-button type="primary" @click="storeBtn">新增</a-button>
-      <a-space>
-        <a-input v-model="search.name" placeholder="请输入用户名" />
-        <a-input v-model="search.phone" placeholder="请输入用户手机号" />
-        <a-button type="primary">搜索</a-button>
-        <a-button>重置</a-button>
-      </a-space>
-    </section>
-    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true }" @page-change="pageChange">
+    <a-button class="mb-10" type="primary" @click="storeBtn">新增</a-button>
+    <a-table :data="data.adminers" column-resizable :bordered="{ cell: true }">
       <template #columns>
         <a-table-column title="Id" data-index="id" />
         <a-table-column title="姓名" data-index="name" />
         <a-table-column title="手机号" data-index="phone" />
-        <a-table-column title="身份证" data-index="card" />
-        <a-table-column title="状态" data-index="state">
+        <a-table-column title="角色" data-index="role">
+          <template #cell="{ record }">{{ record.role.title }}</template>
+        </a-table-column>
+        <a-table-column title="角色" data-index="state">
           <template #cell="{ record }">
             <a-tag :color="record.state ? 'green' : 'red'" bordered>{{ record.state ? '正常' : '关闭' }}</a-tag>
           </template>
@@ -45,13 +39,19 @@
           <a-input-number v-model="set.form.id" />
         </a-form-item>
         <a-form-item field="name" label="姓名" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.name" placeholder="请输入商户姓名" />
+          <a-input v-model="set.form.name" placeholder="请输入员工姓名" />
         </a-form-item>
         <a-form-item field="phone" label="手机号" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.phone" placeholder="请输入商户手机号" />
+          <a-input v-model="set.form.phone" placeholder="请输入员工手机号" />
         </a-form-item>
-        <a-form-item field="card" label="手机号" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.card" placeholder="请输入商户身份证号码" />
+        <a-form-item field="password" label="密码">
+          <a-input v-model="set.form.password" placeholder="请输入密码" />
+        </a-form-item>
+        <a-form-item field="pwd" label="确认密码">
+          <a-input v-model="set.form.pwd" placeholder="请输入确认密码" />
+        </a-form-item>
+        <a-form-item field="role" label="角色" :rules="[{ required: true, message: '不能为空' }]">
+          <a-select v-model="set.form.role" :options="data.roles" />
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
           <a-select v-model="set.form.companies" multiple :options="data.companies" placeholder="请选择公司" />
@@ -72,13 +72,8 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getCompanyList } from '@/api/user';
-import { userList, userPostOrPut } from '@/api/caiwu';
-import { ICompany, IUser } from '@/store/modules/app/types';
-const search = reactive({
-  name: '',
-  phone: '',
-});
+import { getAdminerList, getRoleList, getCompanyList, adminerPutOrPost } from '@/api/user';
+import { ICompany, IRole, IAdminer } from '@/store/modules/app/types';
 const set = reactive({
   visible: false,
   title: '新增',
@@ -86,27 +81,27 @@ const set = reactive({
     id: 0,
     name: '',
     phone: '',
-    card: '',
+    password: undefined,
+    pwd: undefined,
     state: true,
+    role: 1,
     companies: [],
   },
 });
 const formRef = ref();
-const data = reactive<{ adminers: { count: number; data: IUser[] }; companies: { value: number; label: string }[] }>({
-  adminers: {
-    count: 0,
-    data: [],
-  },
+const data = reactive<{ adminers: IAdminer[]; roles: { value: number; label: string }[]; companies: { value: number; label: string }[] }>({
+  adminers: [],
+  roles: [],
   companies: [],
 });
-const getAdminer = async (page = 1, size = 10) => {
-  const [ret, count] = await userList<[IUser[], number]>(page, size);
-  data.adminers.count = count;
-  data.adminers.data = ret;
+const getAdminer = async () => {
+  data.adminers = await getAdminerList();
 };
 getAdminer();
 
 const getRoleCompany = async () => {
+  const roles = await getRoleList<IRole[]>();
+  data.roles = roles.map((role) => ({ value: role.id, label: role.title }));
   const companies = await getCompanyList<ICompany[]>();
   data.companies = companies.map((company) => ({ value: company.id, label: company.name }));
 };
@@ -123,8 +118,8 @@ const editBtn = (record: any) => {
     id: { value: record.id },
     name: { value: record.name },
     phone: { value: record.phone },
-    card: { value: record.card },
     state: { value: record.state },
+    role: { value: record.role.id },
     companies: { value: record.companies.map((item: ICompany) => item.id) },
   });
 };
@@ -138,22 +133,10 @@ const handleCancel = () => {
 
 const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
   if (errors) return;
-  await userPostOrPut(values);
+  await adminerPutOrPost(values);
   handleCancel();
   getAdminer();
 };
-
-// 分页加载
-const pageChange = (page: number) => {
-  getAdminer(page);
-};
 </script>
 
-<style lang="less" scoped>
-.top {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background-color: white;
-}
-</style>
+<style lang="less" scoped></style>

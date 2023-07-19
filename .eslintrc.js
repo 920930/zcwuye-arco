@@ -68,5 +68,6 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
     'import/prefer-default-export': 'off',
     'import/newline-after-import': 'off',
+    '@typescript-eslint/no-shadow': 'off',
   },
 };
