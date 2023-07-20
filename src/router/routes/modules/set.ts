@@ -26,7 +26,7 @@ const DASHBOARD: AppRouteRecordRaw = {
       name: 'company',
       component: () => import('@/views/set/company.vue'),
       meta: {
-        locale: '菜单列表',
+        locale: '公司列表',
         requiresAuth: true,
       },
     },

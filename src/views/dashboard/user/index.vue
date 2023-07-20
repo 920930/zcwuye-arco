@@ -5,11 +5,11 @@
       <a-space>
         <a-input v-model="search.name" placeholder="请输入用户名" />
         <a-input v-model="search.phone" placeholder="请输入用户手机号" />
-        <a-button type="primary">搜索</a-button>
-        <a-button>重置</a-button>
+        <a-button type="primary" @click="searchBtn">搜索</a-button>
+        <a-button @click="searchReset">重置</a-button>
       </a-space>
     </section>
-    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true }" @page-change="pageChange">
+    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true, current: search.currentPage }" @page-change="pageChange">
       <template #columns>
         <a-table-column title="Id" data-index="id" />
         <a-table-column title="姓名" data-index="name" />
@@ -50,7 +50,7 @@
         <a-form-item field="phone" label="手机号" :rules="[{ required: true, message: '不能为空' }]">
           <a-input v-model="set.form.phone" placeholder="请输入商户手机号" />
         </a-form-item>
-        <a-form-item field="card" label="手机号" :rules="[{ required: true, message: '不能为空' }]">
+        <a-form-item field="card" label="身份证" :rules="[{ required: true, message: '不能为空' }]">
           <a-input v-model="set.form.card" placeholder="请输入商户身份证号码" />
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
@@ -76,6 +76,7 @@ import { getCompanyList } from '@/api/user';
 import { userList, userPostOrPut } from '@/api/caiwu';
 import { ICompany, IUser } from '@/store/modules/app/types';
 const search = reactive({
+  currentPage: 1,
   name: '',
   phone: '',
 });
@@ -99,8 +100,8 @@ const data = reactive<{ adminers: { count: number; data: IUser[] }; companies: {
   },
   companies: [],
 });
-const getAdminer = async (page = 1, size = 10) => {
-  const [ret, count] = await userList<[IUser[], number]>(page, size);
+const getAdminer = async (str = '', page = 1, size = 10) => {
+  const [ret, count] = await userList<[IUser[], number]>(str, page, size);
   data.adminers.count = count;
   data.adminers.data = ret;
 };
@@ -145,7 +146,26 @@ const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
 
 // 分页加载
 const pageChange = (page: number) => {
-  getAdminer(page);
+  search.currentPage = page;
+  getAdminer('', page);
+};
+// 关键词搜查
+const searchBtn = () => {
+  const str = new URLSearchParams();
+  if (search.name.length) str.append('name', search.name);
+  if (search.phone.length) str.append('phone', search.phone);
+  if (str.size > 0) {
+    search.currentPage = 1;
+    getAdminer(str.toString(), 1);
+  }
+};
+const searchReset = () => {
+  search.currentPage = 1;
+  if (search.name.length || search.phone.length) {
+    getAdminer();
+  }
+  search.name = '';
+  search.phone = '';
 };
 </script>
 
