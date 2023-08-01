@@ -4,6 +4,7 @@ import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { UserState } from './types';
 import useAppStore from '../app';
+import useCompanyStore from '../company';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -33,8 +34,10 @@ const useUserStore = defineStore('user', {
     },
     // Set user's information
     setInfo(partial: Partial<UserState>) {
+      const companyStore = useCompanyStore();
       const { companies } = partial;
       const companyId = companies ? companies[0].id : undefined;
+      companyStore.setCompany(companyId);
       const ret = { ...partial, companyId };
       this.$patch(ret);
     },

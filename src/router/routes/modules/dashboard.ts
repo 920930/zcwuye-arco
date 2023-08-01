@@ -28,6 +28,15 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
       },
     },
+    {
+      path: 'room',
+      name: 'room',
+      component: () => import('@/views/dashboard/room/index.vue'),
+      meta: {
+        locale: 'menu.server.room',
+        requiresAuth: true,
+      },
+    },
   ],
 };
 

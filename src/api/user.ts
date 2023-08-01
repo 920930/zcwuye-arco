@@ -1,6 +1,7 @@
 import http from '@/utils/http';
 import { UserState } from '@/store/modules/user/types';
-import { IMenu, ICompany, IRole } from '@/store/modules/app/types';
+import { IMenu, IRole } from '@/store/modules/app/types';
+import { ICompany } from '@/store/modules/company/types';
 
 export interface LoginData {
   phone: string;

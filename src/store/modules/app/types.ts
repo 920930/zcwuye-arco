@@ -1,4 +1,5 @@
 import type { RouteRecordNormalized } from 'vue-router';
+import type { ICompany } from '../company/types';
 
 export interface AppState {
   theme: string;
@@ -38,15 +39,6 @@ export interface IRole {
   id: number;
   title: string;
   name: string;
-}
-
-export interface ICompany {
-  id: number;
-  name: string;
-  dong: string;
-  qu: string;
-  qutype: number;
-  state: boolean;
 }
 
 export interface IAdminer {

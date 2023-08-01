@@ -9,7 +9,7 @@
         <a-button @click="searchReset">重置</a-button>
       </a-space>
     </section>
-    <a-table :data="data.adminers.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.adminers.count, showTotal: true, current: search.currentPage }" @page-change="pageChange">
+    <a-table :data="data.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.count, showTotal: true, current: search.currentPage }" @page-change="pageChange">
       <template #columns>
         <a-table-column title="Id" data-index="id" />
         <a-table-column title="姓名" data-index="name" />
@@ -54,7 +54,7 @@
           <a-input v-model="set.form.card" placeholder="请输入商户身份证号码" />
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
-          <a-select v-model="set.form.companies" multiple :options="data.companies" placeholder="请选择公司" />
+          <a-select v-model="set.form.companies" multiple :options="companyStore.companies.map((item) => ({ value: item.id, label: item.name }))" placeholder="请选择公司" />
         </a-form-item>
         <a-form-item field="state" label="状态" :rules="[{ required: true, message: '不能为空' }]">
           <a-switch v-model="set.form.state" />
@@ -72,15 +72,18 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getCompanyList } from '@/api/user';
 import { userList, userPostOrPut } from '@/api/caiwu';
-import { ICompany, IUser } from '@/store/modules/app/types';
+import type { IUser } from '@/store/modules/app/types';
+import type { ICompany } from '@/store/modules/company/types';
+import { useCompanyStore } from '@/store';
+
+const companyStore = useCompanyStore();
 const search = reactive({
   currentPage: 1,
   name: '',
   phone: '',
 });
-const set = reactive({
+const set = reactive<{ visible: boolean; title: string; form: { id: number; name: string; phone: string; card: string; state: boolean; companies: { value: number; label: string }[] } }>({
   visible: false,
   title: '新增',
   form: {
@@ -93,25 +96,16 @@ const set = reactive({
   },
 });
 const formRef = ref();
-const data = reactive<{ adminers: { count: number; data: IUser[] }; companies: { value: number; label: string }[] }>({
-  adminers: {
-    count: 0,
-    data: [],
-  },
-  companies: [],
+const data = reactive<{ count: number; data: IUser[] }>({
+  count: 0,
+  data: [],
 });
 const getAdminer = async (str = '', page = 1, size = 10) => {
   const [ret, count] = await userList<[IUser[], number]>(str, page, size);
-  data.adminers.count = count;
-  data.adminers.data = ret;
+  data.count = count;
+  data.data = ret;
 };
 getAdminer();
-
-const getRoleCompany = async () => {
-  const companies = await getCompanyList<ICompany[]>();
-  data.companies = companies.map((company) => ({ value: company.id, label: company.name }));
-};
-getRoleCompany();
 
 const storeBtn = () => {
   set.visible = true;

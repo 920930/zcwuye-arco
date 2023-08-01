@@ -54,7 +54,9 @@
           <a-select v-model="set.form.role" :options="data.roles" />
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
-          <a-select v-model="set.form.companies" multiple :options="data.companies" placeholder="请选择公司" />
+          <a-select v-model="set.form.companies" multiple placeholder="请选择公司">
+            <a-option v-for="company in companyStore.companies" :key="company.id" :label="company.name" :value="company.id" />
+          </a-select>
         </a-form-item>
         <a-form-item field="state" label="状态" :rules="[{ required: true, message: '不能为空' }]">
           <a-switch v-model="set.form.state" />
@@ -72,8 +74,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getAdminerList, getRoleList, getCompanyList, adminerPutOrPost } from '@/api/user';
-import { ICompany, IRole, IAdminer } from '@/store/modules/app/types';
+import { useCompanyStore } from '@/store';
+import { getAdminerList, getRoleList, adminerPutOrPost } from '@/api/user';
+import type { IRole, IAdminer } from '@/store/modules/app/types';
+import type { ICompany } from '@/store/modules/company/types';
+
 const set = reactive({
   visible: false,
   title: '新增',
@@ -88,11 +93,11 @@ const set = reactive({
     companies: [],
   },
 });
+const companyStore = useCompanyStore();
 const formRef = ref();
-const data = reactive<{ adminers: IAdminer[]; roles: { value: number; label: string }[]; companies: { value: number; label: string }[] }>({
+const data = reactive<{ adminers: IAdminer[]; roles: { value: number; label: string }[] }>({
   adminers: [],
   roles: [],
-  companies: [],
 });
 const getAdminer = async () => {
   data.adminers = await getAdminerList();
@@ -102,8 +107,6 @@ getAdminer();
 const getRoleCompany = async () => {
   const roles = await getRoleList<IRole[]>();
   data.roles = roles.map((role) => ({ value: role.id, label: role.title }));
-  const companies = await getCompanyList<ICompany[]>();
-  data.companies = companies.map((company) => ({ value: company.id, label: company.name }));
 };
 getRoleCompany();
 

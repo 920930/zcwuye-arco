@@ -56,7 +56,7 @@
         </a-form-item>
         <a-form-item field="company" label="所属公司" :rules="[{ required: true, message: '不能为空' }]">
           <a-select v-model="modal.form.company" multiple>
-            <a-option v-for="company in data.company" :key="company.id" :label="company.name" :value="company.id" />
+            <a-option v-for="company in companyStore.companies" :key="company.id" :label="company.name" :value="company.id" />
           </a-select>
         </a-form-item>
         <a-form-item field="parent" label="父级路由">
@@ -75,18 +75,18 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getMenuList, getRoleList, getCompanyList, menuPostOrPut } from '@/api/user';
-import { useUserStore, useAppStore } from '@/store';
-import type { IMenu, IRole, ICompany, IOptions } from '@/store/modules/app/types';
+import { getMenuList, getRoleList, menuPostOrPut } from '@/api/user';
+import { useUserStore, useAppStore, useCompanyStore } from '@/store';
+import type { IMenu, IRole, IOptions } from '@/store/modules/app/types';
 import { menuToOption } from '@/utils';
 
 const appStore = useAppStore();
 const userStore = useUserStore();
+const companyStore = useCompanyStore();
 
-const data = reactive<{ menu: IMenu[]; roles: IRole[]; company: ICompany[]; menuOption: IOptions[] }>({
+const data = reactive<{ menu: IMenu[]; roles: IRole[]; menuOption: IOptions[] }>({
   menu: [],
   roles: [],
-  company: [],
   menuOption: [],
 });
 const getMenuBtn = async () => {
@@ -96,7 +96,6 @@ const getMenuBtn = async () => {
 getMenuBtn();
 const getRoleAdCompany = async () => {
   data.roles = await getRoleList<IRole[]>();
-  data.company = await getCompanyList<ICompany[]>();
 };
 getRoleAdCompany();
 // 公司名称
