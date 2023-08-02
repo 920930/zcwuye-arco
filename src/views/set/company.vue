@@ -64,6 +64,7 @@
 import { ref, reactive } from 'vue';
 import { companyPutOrPost } from '@/api/user';
 import { useCompanyStore } from '@/store';
+import { debounce } from '@/utils/caiwu';
 const qutype = [
   { value: 1, label: '数字区 如1区 2区' },
   { value: 2, label: '字母区 如A区 B区' },
@@ -112,12 +113,12 @@ const handleCancel = () => {
   formRef.value.resetFields();
 };
 
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  await companyPutOrPost(values);
+const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
+  if (val[0].errors) return;
+  await companyPutOrPost(val[0].values);
   handleCancel();
   companyStore.setCompanise();
-};
+});
 
 const qutypeFn = (val: number[]) => {
   return qutype.filter((item) => new Set(val).has(item.value));

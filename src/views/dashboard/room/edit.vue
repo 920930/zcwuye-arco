@@ -35,7 +35,7 @@
 <script lang="ts" setup>
 import { computed, ref, reactive, watch } from 'vue';
 import { useCompanyStore } from '@/store';
-import { IRoom, qutypeFn } from '@/utils/caiwu';
+import { IRoom, qutypeFn, debounce } from '@/utils/caiwu';
 import { roomPostOrPut } from '@/api/caiwu';
 
 const companyStore = useCompanyStore();
@@ -88,11 +88,12 @@ const handleCancel = () => {
   visible.value = false;
   formRef.value.resetFields();
 };
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  await roomPostOrPut(values);
+
+const formSubmit = debounce(async (val: { errors: any; values: any }[]) => {
+  if (val[0].errors) return;
+  await roomPostOrPut(val[0].values);
   handleCancel();
-};
+});
 const dongValues = Array.from({ length: companyStore.company.dong ?? 0 }, (_v, i) => ({ value: i, label: `${i === 0 ? '无' : `${i}栋`}` }));
 const quValues = qutypeFn(companyStore.company.qu ?? 0, companyStore.company.qutype ?? [], companyStore.company.qulen);
 </script>

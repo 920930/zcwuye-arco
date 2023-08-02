@@ -1,3 +1,5 @@
+import { h, render } from 'vue';
+import { IconSync } from '@arco-design/web-vue/es/icon';
 import type { ICompany } from '@/store/modules/company/types';
 
 export interface IRoom {
@@ -119,4 +121,26 @@ export const roomToTree = (data: IRoom[], company: ICompany) => {
     });
   }
   return res;
+};
+
+// 防抖
+export const debounce = (fn: (val: any) => void, dafly = 600) => {
+  let timer: NodeJS.Timeout | null = null;
+  const div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.left = '50%';
+  div.style.top = '50%';
+  div.style.zIndex = '1000000';
+  const vm = h(IconSync, { spin: true, size: 30 });
+  render(vm, div);
+  return (...val: any) => {
+    if (!document.body.contains(div)) {
+      document.body.appendChild(div);
+    }
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      document.body.removeChild(div);
+      fn(val);
+    }, dafly);
+  };
 };

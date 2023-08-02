@@ -78,6 +78,7 @@ import { useCompanyStore } from '@/store';
 import { getAdminerList, getRoleList, adminerPutOrPost } from '@/api/user';
 import type { IRole, IAdminer } from '@/store/modules/app/types';
 import type { ICompany } from '@/store/modules/company/types';
+import { debounce } from '@/utils/caiwu';
 
 const set = reactive({
   visible: false,
@@ -134,12 +135,10 @@ const handleCancel = () => {
   formRef.value.resetFields();
 };
 
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  await adminerPutOrPost(values);
+const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
+  if (val[0].errors) return;
+  await adminerPutOrPost(val[0].values);
   handleCancel();
   getAdminer();
-};
+});
 </script>
-
-<style lang="less" scoped></style>

@@ -79,6 +79,7 @@ import { getMenuList, getRoleList, menuPostOrPut } from '@/api/user';
 import { useUserStore, useAppStore, useCompanyStore } from '@/store';
 import type { IMenu, IRole, IOptions } from '@/store/modules/app/types';
 import { menuToOption } from '@/utils';
+import { debounce } from '@/utils/caiwu';
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -137,8 +138,6 @@ const editBtn = (record: IMenu) => {
   } else {
     setroles = data.roles.map((item) => item.name);
   }
-  // const setroles = roles ? (roles.includes('*') ? data.roles.map((item) => item.name) : [...roles]) : data.roles.map((item) => item.name);
-  // modal.form = record;
   formRef.value.setFields({
     'id': { value: record.id },
     'name': { value: record.name },
@@ -156,25 +155,13 @@ const handleCancel = () => {
   modal.visible = false;
   formRef.value.clearValidate();
   formRef.value.resetFields();
-  // modal.form = {
-  //   id: 0,
-  //   name: '',
-  //   meta: {
-  //     locale: '',
-  //     icon: '',
-  //     order: 0,
-  //     requiresAuth: true,
-  //   },
-  //   company: [],
-  //   parent: undefined,
-  // };
 };
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  values.parent = values.parent === undefined ? null : values.parent;
-  await menuPostOrPut(values);
+const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
+  if (val[0].errors) return;
+  val[0].values.parent = val[0].values.parent === undefined ? null : val[0].values.parent;
+  await menuPostOrPut(val[0].values);
   handleCancel();
   getMenuBtn();
   appStore.fetchServerMenuConfig(userStore.companyId);
-};
+});
 </script>

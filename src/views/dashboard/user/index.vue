@@ -73,6 +73,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { userList, userPostOrPut } from '@/api/caiwu';
+import { debounce } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
 import type { ICompany } from '@/store/modules/company/types';
 import { useCompanyStore } from '@/store';
@@ -131,12 +132,12 @@ const handleCancel = () => {
   formRef.value.resetFields();
 };
 
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  await userPostOrPut(values);
+const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
+  if (val[0].errors) return;
+  await userPostOrPut(val[0].values);
   handleCancel();
   getAdminer();
-};
+});
 
 // 分页加载
 const pageChange = (page: number) => {

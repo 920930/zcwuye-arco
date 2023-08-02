@@ -43,6 +43,8 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { getRoleList, rolePostOrPut } from '@/api/user';
+import { debounce } from '@/utils/caiwu';
+
 const set = reactive({
   visible: false,
   title: '新增',
@@ -80,12 +82,10 @@ const handleCancel = () => {
   formRef.value.resetFields();
 };
 
-const formSubmit = async ({ values, errors }: { values: any; errors: any }) => {
-  if (errors) return;
-  await rolePostOrPut(values);
+const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
+  if (val[0].errors) return;
+  await rolePostOrPut(val[0].values);
   handleCancel();
   getRole();
-};
+});
 </script>
-
-<style lang="less" scoped></style>
