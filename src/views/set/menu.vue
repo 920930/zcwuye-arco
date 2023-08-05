@@ -44,7 +44,7 @@
           <a-switch v-model="modal.form.meta.requiresAuth" disabled />
         </a-form-item>
         <a-form-item field="meta.order" label="排序">
-          <a-input-number v-model="modal.form.meta.order" placeholder="请输入路由locale" />
+          <a-input-number v-model="modal.form.meta.order" placeholder="请输排序" />
         </a-form-item>
         <a-form-item field="meta.icon" label="图标">
           <a-input v-model="modal.form.meta.icon" placeholder="请输入路由图标" />
@@ -61,6 +61,9 @@
         </a-form-item>
         <a-form-item field="parent" label="父级路由">
           <a-cascader v-model="modal.form.parent" :options="data.menuOption" check-strictly placeholder="请选择父级栏目 可不选" allow-clear />
+        </a-form-item>
+        <a-form-item field="meta.hideInMenu" label="显示">
+          <a-switch v-model="modal.form.meta.hideInMenu" />
         </a-form-item>
         <a-form-item>
           <a-space>
@@ -117,6 +120,7 @@ const modal = reactive<{ visible: boolean; title: string; form: IMenu }>({
       icon: '',
       order: 1,
       requiresAuth: true,
+      hideInMenu: true,
       roles: [],
     },
     company: [],
@@ -145,6 +149,7 @@ const editBtn = (record: IMenu) => {
     'meta.order': { value: record.meta.order },
     'meta.icon': { value: record.meta.icon },
     'meta.requiresAuth': { value: record.meta.requiresAuth },
+    'meta.hideInMenu': { value: record.meta.hideInMenu },
     'meta.roles': { value: setroles },
     'company': { value: record.company.map((item) => item) },
     'parent': { value: record.parent?.id ?? null },

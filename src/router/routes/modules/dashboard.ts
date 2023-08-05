@@ -37,6 +37,24 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
       },
     },
+    {
+      path: 'contract',
+      name: 'contract',
+      component: () => import('@/views/dashboard/contract/index.vue'),
+      meta: {
+        locale: 'menu.server.contract',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: 'contract/:id',
+      name: 'contractStore',
+      component: () => import('@/views/dashboard/contract/store.vue'),
+      meta: {
+        locale: 'menu.server.contractStore',
+        requiresAuth: true,
+      },
+    },
   ],
 };
 

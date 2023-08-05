@@ -37,8 +37,8 @@
         <a-form-item field="dong" label="栋号" :rules="[{ required: true, message: '不能为空' }]">
           <a-input-number v-model="set.form.dong" placeholder="0栋 表示本项目没有栋号" />
         </a-form-item>
-        <a-form-item field="qu" label="区号" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.qu" placeholder="本项目有多少个区" />
+        <a-form-item field="qu" label="区/楼号" :rules="[{ required: true, message: '不能为空' }]">
+          <a-input-number v-model="set.form.qu" placeholder="本项目有多少个区/楼" />
         </a-form-item>
         <a-form-item field="qutype" label="区类型" :rules="[{ required: true, message: '不能为空' }]">
           <a-select v-model="set.form.qutype" :options="qutype" multiple placeholder="请选择区" />
@@ -65,6 +65,7 @@ import { ref, reactive } from 'vue';
 import { companyPutOrPost } from '@/api/user';
 import { useCompanyStore } from '@/store';
 import { debounce } from '@/utils/caiwu';
+import { ICompany } from '@/store/modules/company/types';
 const qutype = [
   { value: 1, label: '数字区 如1区 2区' },
   { value: 2, label: '字母区 如A区 B区' },
@@ -72,16 +73,16 @@ const qutype = [
   { value: 4, label: '楼区 如1楼 2楼' },
   { value: 5, label: '特区 如特1区' },
 ];
-const set = reactive({
+const set = reactive<{ visible: boolean; title: string; form: ICompany }>({
   visible: false,
   title: '新增',
   form: {
     id: 0,
     name: '',
-    dong: 0,
-    qu: '',
+    dong: undefined,
+    qu: undefined,
     qutype: [],
-    qulen: 0,
+    qulen: undefined,
     state: true,
   },
 });

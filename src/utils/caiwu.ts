@@ -11,6 +11,13 @@ export interface IRoom {
   area: number;
 }
 
+export interface ITrees {
+  title: string;
+  value: string;
+  key: string;
+  children?: ITrees[];
+}
+
 export const ZM = 'ABCDEFGHIJKLMNOPQRST';
 export const qutypeFn = (qu: number, type: number[], len = 0) => {
   const arr: { value: any; label: string }[] = [];
@@ -28,14 +35,8 @@ export const qutypeFn = (qu: number, type: number[], len = 0) => {
         }
         break;
       case 2: // 字母区
-        if (len) {
-          for (let i = 0; i < len; i += 1) {
-            arr.push({ value: `${ZM[i]}区`, label: `${ZM[i]}区` });
-          }
-        } else {
-          for (let i = 0; i < qu; i += 1) {
-            arr.push({ value: `${ZM[i]}区`, label: `${ZM[i]}区` });
-          }
+        for (let i = 0; i < qu; i += 1) {
+          arr.push({ value: `${ZM[i]}区`, label: `${ZM[i]}区` });
         }
         break;
       case 3: // 字母数字区
@@ -47,11 +48,11 @@ export const qutypeFn = (qu: number, type: number[], len = 0) => {
         break;
       case 4: // 楼区
         if (len) {
-          for (let i = 1; i <= len; i += 1) {
+          for (let i = 0; i <= len; i += 1) {
             arr.push({ value: `${i}楼`, label: `${i}楼` });
           }
         } else {
-          for (let i = 1; i <= qu; i += 1) {
+          for (let i = 0; i <= qu; i += 1) {
             arr.push({ value: `${i}楼`, label: `${i}楼` });
           }
         }
@@ -75,56 +76,66 @@ export const qutypeFn = (qu: number, type: number[], len = 0) => {
 export const roomToTree = (data: IRoom[], company: ICompany) => {
   const res: { [key: string]: IRoom[] } = {};
   if (company.dong) {
-    for (let i = 1; i <= company.dong; i += 1) {
-      const rooms = data.filter((item) => item.dong === i);
-      if (rooms.length) res[`${i}栋`] = rooms;
-    }
-  }
-  if (company.qu) {
-    company.qutype?.forEach((t) => {
-      switch (t) {
-        // 数字区
-        case 1:
-          if (!company.dong) {
-            for (let i = 0; i < (company.qu ?? 0); i += 1) {
-              const rooms = data.filter((item) => item.qu === `${i}区`);
-              if (rooms.length) res[`${i}区`] = rooms;
-            }
-          }
-          break;
-        // 字母
-        case 2:
-          for (let i = 0; i < (company.qu ?? 0); i += 1) {
-            const rooms = data.filter((item) => item.qu === `${ZM[i]}区`);
-            if (rooms.length) res[`${ZM[i]}区`] = rooms;
-          }
-          break;
-        // 字母数字 A2
-        case 3:
-          for (let i = 0; i < (company.qu ?? 0); i += 1) {
-            for (let j = 1; j <= (company.qulen ?? 1); j += 1) {
-              const rooms = data.filter((item) => item.qu === `${ZM[i]}${j}区`);
-              if (rooms.length) res[`${ZM[i]}${j}区`] = rooms;
-            }
-          }
-          break;
-        // 特区
-        case 5:
-          for (let i = 0; i < (company.qu ?? 0); i += 1) {
-            const rooms = data.filter((item) => item.qu === `特${i}区`);
-            if (rooms.length) res[`特${i}区`] = rooms;
-          }
-          break;
-        default:
-          break;
-      }
+    const dset = new Set();
+    data.forEach((item) => dset.add(item.dong));
+    dset.forEach((d) => {
+      res[`${d}栋`] = data.filter((item) => item.dong === d);
+    });
+  } else {
+    const qset = new Set();
+    data.forEach((item) => qset.add(item.qu));
+    qset.forEach((q) => {
+      res[`${q}`] = data.filter((item) => item.qu === q);
     });
   }
   return res;
 };
 
+// 合同页面 商铺tree
+export const contractRoomToTree = (data: IRoom[], company: ICompany) => {
+  const dongs: ITrees[] = [];
+
+  if (company.dong) {
+    const dset = new Set<number>();
+    data.forEach((item) => dset.add(item.dong));
+    dset.forEach((d) => {
+      const ds = data.filter((item) => item.dong === d);
+      const dval: ITrees = { title: `${d}栋`, value: `${d}栋`, key: Math.random().toString(16).slice(2), children: [] };
+      const qset = new Set<string>();
+      ds.forEach((item) => qset.add(item.qu));
+      qset.forEach((q) => {
+        const qval: ITrees = { title: q, value: q, key: Math.random().toString(16).slice(2), children: [] };
+        const nums = ds.filter((item) => item.qu === q);
+        if (q.startsWith('0')) {
+          nums.forEach((item) => dval.children?.push({ title: `${dval.title}${item.num}`, value: `${dval.value}${item.num}`, key: `${item.id}` }));
+        } else {
+          nums.forEach((item) => qval.children?.push({ title: `${d === 0 ? '' : dval.title}${q}${item.num}`, value: `${dval.value}${q}${item.num}`, key: `${item.id}` }));
+          dval.children?.push(qval);
+        }
+      });
+      if (d === 0) {
+        if (dval.children?.length) dongs.push(...dval.children);
+      } else {
+        dongs.push(dval);
+      }
+    });
+    dset.clear();
+  } else {
+    const qset = new Set<string>();
+    data.forEach((item) => qset.add(item.qu));
+    qset.forEach((q) => {
+      const qval: ITrees = { title: q, value: q, key: Math.random().toString(16).slice(2), children: [] };
+      const nums = data.filter((item) => item.qu === q);
+      nums.forEach((item) => qval.children?.push({ title: `${item.qu}${item.num}`, value: `${item.qu}${item.num}`, key: `${item.id}` }));
+      dongs.push(qval);
+    });
+    qset.clear();
+  }
+  return dongs;
+};
+
 // 防抖
-export const debounce = (fn: (val: any) => void, dafly = 600) => {
+export const debounce = (fn: (val: any) => void, dafly = 800) => {
   let timer: NodeJS.Timeout | null = null;
   const div = document.createElement('div');
   div.style.position = 'absolute';

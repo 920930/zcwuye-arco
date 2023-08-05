@@ -17,6 +17,8 @@ export default {
   'menu.server.adminer': '员工列表',
   'menu.server.room': '商铺列表',
   'menu.server.user': '商户列表',
+  'menu.server.contract': '合同列表',
+  'menu.server.contractStore': '合同增改',
   'menu.server.ad': '广告位列表',
   'menu.server.caiwu': '财务管理',
   'menu.server.hetong': '合同列表',

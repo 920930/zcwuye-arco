@@ -29,6 +29,7 @@ export interface IMenu {
     icon?: string;
     order?: number;
     requiresAuth?: boolean;
+    hideInMenu?: boolean;
     roles?: string[];
   };
   children?: IMenu[];

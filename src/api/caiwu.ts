@@ -10,6 +10,8 @@ export const userList = <T>(str: string, page = 1, size = 10) => {
 export const userPostOrPut = <T>(data: any) => {
   return data.id ? http.patch<T>(`/user/${data.id}`, data) : http.post<T>('/user', data);
 };
+// 商户 - 搜索
+export const userSearch = <T>(str: string) => http.get<T>(`/user/search?val=${str}`);
 
 // 商铺 - 列表
 export const roomList = <T>(companyId: number) => http.get<T>(`/room?companyId=${companyId}`);
@@ -19,3 +21,14 @@ export const roomPostOrPut = <T>(data: any) => {
 };
 // 商铺 - 删除
 export const roomDel = <T>(id: number) => http.delete<T>(`/room/${id}`);
+
+// 合同 - 列表
+export const contractList = <T>(companyId: number) => http.get<T>(`/contract?companyId=${companyId}`);
+// 合同 - 单个
+export const contractOne = <T>(id: number) => http.get<T>(`/contract?id=${id}`);
+// 合同 - 编辑或新增
+export const contractPostOrPut = <T>(data: any) => {
+  return data.id ? http.patch<T>(`/contract/${data.id}`, data, { headers: { 'content-type': 'multipart/form-data' } }) : http.post<T>('/contract', data, { headers: { 'content-type': 'multipart/form-data' } });
+};
+// 合同 - 删除
+export const contractDel = <T>(id: number) => http.delete<T>(`/contract/${id}`);
