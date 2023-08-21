@@ -38,8 +38,7 @@ import { ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCompanyStore } from '@/store';
 import { contractOne, roomList, userSearch, contractPostOrPut } from '@/api/caiwu';
-import { contractRoomToTree } from '@/utils/caiwu';
-import type { IRoom, ITrees } from '@/utils/caiwu';
+import { type IRoom, type ITrees, contractRoomToTree, tinyCanvas } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
 import { Message } from '@arco-design/web-vue';
 
@@ -62,7 +61,7 @@ const rooms = ref<ITrees[]>();
 const treeCheckStrictly = ref(false);
 const userOptions = ref<{ label: string; value: string }[]>([]);
 const btnDisabled = ref(false);
-const blobs = ref<File[]>([]);
+const blobs = ref<Blob[]>([]);
 const uploadRef = ref();
 const formRef = ref();
 const form = reactive<IForm>({
@@ -94,7 +93,7 @@ const searchUser = async (val: string) => {
   }
 };
 
-const handleSubmit = (val: any) => {
+const handleSubmit = async (val: any) => {
   const { errors, values } = val;
   if (errors) return;
   btnDisabled.value = true;
@@ -102,25 +101,29 @@ const handleSubmit = (val: any) => {
     Message.warning('请勾选店铺');
     return;
   }
-  // if(blobs.value.length)
   uploadRef.value.submit();
 
   const formDate = new FormData();
   Object.keys(values).forEach((k) => {
     formDate.set(k, values[k]);
   });
-  console.log(blobs.value);
-  blobs.value.forEach((b) => formDate.append('files', b));
-  contractPostOrPut(formDate).then(() => {
-    Message.success('创建成功');
-    blobs.value = [];
-  });
-  btnDisabled.value = false;
+  const map = blobs.value.map((item) => tinyCanvas(item));
+  Promise.all(map)
+    .then((ret) => {
+      ret.forEach((res) => formDate.append('files', res));
+    })
+    .then(() => {
+      contractPostOrPut(formDate).then(() => {
+        Message.success('创建成功');
+        blobs.value = [];
+      });
+      btnDisabled.value = false;
+    });
 };
 
 const customRequest = (option: any) => {
   const { fileItem } = option;
-  blobs.value.push(fileItem.file);
+  blobs.value.push(fileItem.file as File);
   return {};
 };
 </script>
