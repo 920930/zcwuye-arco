@@ -18,7 +18,7 @@
         <a-select v-model="form.userId" :options="userOptions" placeholder="通过手机或姓名搜索老板" allow-search allow-clear @search="searchUser" />
       </a-form-item>
       <a-form-item field="yyzz" label="营业执照" tooltip="营业执照">
-        <a-upload ref="uploadRef" v-model="form.yyzz" :limit="1" :auto-upload="false" :custom-request="customRequest" />
+        <a-upload ref="uploadRef" v-model="form.yyzz" multiple :limit="2" :auto-upload="false" :custom-request="customRequest" />
       </a-form-item>
       <a-form-item field="startTime" label="合同开始时间" tooltip="合同开始到结束的时间" :rules="[{ required: true, message: '请选择合同时间范围' }]">
         <a-date-picker v-model="form.startTime" style="width: 60%" />
@@ -38,10 +38,20 @@ import { ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCompanyStore } from '@/store';
 import { contractOne, roomList, userSearch, contractPostOrPut } from '@/api/caiwu';
-import { contractRoomToTree } from '@/utils/caiwu';
-import type { IRoom, ITrees } from '@/utils/caiwu';
+import { type IRoom, type ITrees, contractRoomToTree, tinyCanvas } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
 import { Message } from '@arco-design/web-vue';
+
+interface IForm {
+  id: number;
+  rooms: string[];
+  name: string;
+  phone: string;
+  userId: string;
+  startTime: string;
+  endTime: string;
+  yyzz: any[];
+}
 
 const route = useRoute();
 const companyStore = useCompanyStore();
@@ -51,10 +61,10 @@ const rooms = ref<ITrees[]>();
 const treeCheckStrictly = ref(false);
 const userOptions = ref<{ label: string; value: string }[]>([]);
 const btnDisabled = ref(false);
-const formValues = ref<any>();
+const blobs = ref<Blob[]>([]);
 const uploadRef = ref();
 const formRef = ref();
-const form = reactive({
+const form = reactive<IForm>({
   id,
   rooms: [],
   name: '',
@@ -83,34 +93,37 @@ const searchUser = async (val: string) => {
   }
 };
 
-const handleSubmit = (val: any) => {
+const handleSubmit = async (val: any) => {
   const { errors, values } = val;
   if (errors) return;
+  btnDisabled.value = true;
   if (values.rooms.length === 0) {
     Message.warning('请勾选店铺');
     return;
   }
-  formValues.value = values;
   uploadRef.value.submit();
+
+  const formDate = new FormData();
+  Object.keys(values).forEach((k) => {
+    formDate.set(k, values[k]);
+  });
+  const map = blobs.value.map((item) => tinyCanvas(item));
+  Promise.all(map)
+    .then((ret) => {
+      ret.forEach((res) => formDate.append('files', res));
+    })
+    .then(() => {
+      contractPostOrPut(formDate).then(() => {
+        Message.success('创建成功');
+        blobs.value = [];
+      });
+      btnDisabled.value = false;
+    });
 };
 
 const customRequest = (option: any) => {
-  btnDisabled.value = true;
-  const { fileItem, name: fileName } = option;
-  const formDate = new FormData();
-  formDate.set('id', formValues.value.id);
-  formDate.set('rooms', formValues.value.rooms);
-  formDate.set('name', formValues.value.name);
-  formDate.set('phone', formValues.value.phone);
-  formDate.set('userId', formValues.value.userId);
-  formDate.set('startTime', formValues.value.startTime);
-  formDate.set('endTime', formValues.value.endTime);
-  formDate.set(fileName || 'files', fileItem);
-  contractPostOrPut(formDate).then(() => {
-    Message.success('创建成功');
-    formValues.value = null;
-    btnDisabled.value = false;
-  });
+  const { fileItem } = option;
+  blobs.value.push(fileItem.file as File);
   return {};
 };
 </script>

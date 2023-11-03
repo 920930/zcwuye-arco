@@ -155,3 +155,25 @@ export const debounce = (fn: (val: any) => void, dafly = 800) => {
     }, dafly);
   };
 };
+
+export const tinyCanvas = (blob: Blob, quality = 60, width = 1000): Promise<Blob> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    const img = new Image();
+    reader.addEventListener('load', (e) => {
+      img.src = e.target?.result as string;
+    });
+    img.addEventListener('load', () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      // 等比例高度
+      canvas.height = (img.height * width) / img.width;
+      // 将图片铺满等比例宽高的canvas
+      ctx?.drawImage(img, 0, 0, width, canvas.height);
+      // 输出为base64图片, quality为0-1区间
+      canvas.toBlob((file) => resolve(file as Blob), blob.type, quality / 100);
+    });
+  });
+};
