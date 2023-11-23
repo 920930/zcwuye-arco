@@ -56,3 +56,14 @@ export const getAdminerList = <T>() => http.get<T>('/adminer');
 export const adminerPutOrPost = <T>(data: ICompany) => {
   return data.id ? http.patch<T>(`/adminer/${data.id}`, data) : http.post<T>('/adminer', data);
 };
+
+// 权限 - 列表
+export const getPermissionList = <T>() => {
+  return http.get<T>('/permission');
+};
+// 权限 - 编辑或新增
+export const PermissionPostOrPut = <T>(data: IRole) => {
+  return data.id ? http.put<T>(`/permission/${data.id}`, data) : http.post<T>('/permission', data);
+};
+// 权限 - 删除
+export const PermissionRemove = (id: number) => http.delete(`/permission/${id}`);

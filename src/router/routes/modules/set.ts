@@ -31,6 +31,15 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'adminer',
+      name: 'adminer',
+      component: () => import('@/views/set/adminer.vue'),
+      meta: {
+        locale: '员工列表',
+        requiresAuth: true,
+      },
+    },
+    {
       path: 'role',
       name: 'role',
       component: () => import('@/views/set/role.vue'),
@@ -40,11 +49,11 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
-      path: 'adminer',
-      name: 'adminer',
-      component: () => import('@/views/set/adminer.vue'),
+      path: 'permission',
+      name: 'permission',
+      component: () => import('@/views/set/permission.vue'),
       meta: {
-        locale: '员工列表',
+        locale: '权限列表',
         requiresAuth: true,
       },
     },

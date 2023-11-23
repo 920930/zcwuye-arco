@@ -26,11 +26,29 @@ const locale = computed(() => {
 </script>
 
 <style lang="less">
+.flex {
+  display: flex;
+  gap: 20px;
+}
+
 .m-20 {
   margin: 20px;
 }
 
+.p-20 {
+  padding: 20px;
+}
+
 .mb-10 {
   margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.bg-white {
+  background-color: white;
+  border-radius: 5px;
 }
 </style>

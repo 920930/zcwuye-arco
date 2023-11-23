@@ -36,7 +36,7 @@
         </a-popconfirm>
 
         <a-button type="dashed" status="warning" size="small" @click="$emit('editFn', room.id)">编辑</a-button>
-        <a-button type="dashed" status="success" size="small">进入</a-button>
+        <a-button type="dashed" status="success" size="small" @click="routeInShow">进入</a-button>
       </a-space>
     </section>
   </section>
@@ -45,8 +45,9 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import type { IRoom } from '@/utils/caiwu';
+import { useRouter } from 'vue-router';
 
-const props = defineProps<{ room: IRoom }>();
+const props = defineProps<{ room: IRoom & { contract?: { id: number } } }>();
 defineEmits<{
   editFn: [id: number];
   delFn: [id: number];
@@ -54,6 +55,10 @@ defineEmits<{
 const dongqunum = computed(() => {
   return `${props.room.dong ? `${props.room.dong}栋` : ''}${props.room.qu.includes('0') ? '' : props.room.qu}${props.room.num}`;
 });
+const router = useRouter();
+const routeInShow = () => {
+  router.push({ name: 'roomShow', params: { id: props.room.id, cid: props.room.contract?.id ?? 0 } });
+};
 </script>
 
 <style lang="less" scoped>

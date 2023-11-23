@@ -38,6 +38,15 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'room/:id/contract/:cid',
+      name: 'roomShow',
+      component: () => import('@/views/dashboard/room/show.vue'),
+      meta: {
+        locale: 'menu.server.roomShow',
+        requiresAuth: true,
+      },
+    },
+    {
       path: 'contract',
       name: 'contract',
       component: () => import('@/views/dashboard/contract/index.vue'),

@@ -41,17 +41,7 @@ import { contractOne, roomList, userSearch, contractPostOrPut } from '@/api/caiw
 import { type IRoom, type ITrees, contractRoomToTree, tinyCanvas } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
 import { Message } from '@arco-design/web-vue';
-
-interface IForm {
-  id: number;
-  rooms: string[];
-  name: string;
-  phone: string;
-  userId: string;
-  startTime: string;
-  endTime: string;
-  yyzz: any[];
-}
+import type { IContract } from '@/types/caiwu';
 
 const route = useRoute();
 const companyStore = useCompanyStore();
@@ -64,7 +54,7 @@ const btnDisabled = ref(false);
 const blobs = ref<Blob[]>([]);
 const uploadRef = ref();
 const formRef = ref();
-const form = reactive<IForm>({
+const form = reactive<IContract>({
   id,
   rooms: [],
   name: '',
