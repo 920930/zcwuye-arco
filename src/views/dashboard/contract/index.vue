@@ -1,7 +1,7 @@
 <template>
   <section class="m-20">
     <section class="top">
-      <a-button type="primary" @click="storeBtn">新增</a-button>
+      <a-button type="primary" @click="storeBtn(0)">新增</a-button>
       <a-space>
         <a-input v-model="search.name" placeholder="请输入用户名" />
         <a-input v-model="search.phone" placeholder="请输入用户手机号" />
@@ -11,71 +11,38 @@
     </section>
     <a-table :data="data.data" column-resizable :bordered="{ cell: true }" :pagination="{ total: data.count, showTotal: true, current: search.currentPage }" @page-change="pageChange">
       <template #columns>
-        <a-table-column title="姓名" data-index="name" />
-        <a-table-column title="手机号" data-index="phone" />
-        <a-table-column title="身份证" data-index="card" />
+        <!-- <a-table-column title="ID" data-index="id" /> -->
+        <a-table-column title="合同编码" data-index="bianma" />
+        <a-table-column title="铺面" data-index="oldRooms" />
+        <a-table-column title="铺面名" data-index="name" />
+        <a-table-column title="老板" data-index="user.name" />
+        <a-table-column title="手机号" data-index="user.phone" />
+        <a-table-column title="合同开始时间" data-index="startTime" />
+        <a-table-column title="合同结束时间" data-index="endTime" />
         <a-table-column title="状态" data-index="state">
           <template #cell="{ record }">
-            <a-tag :color="record.state ? 'green' : 'red'" bordered>{{ record.state ? '正常' : '关闭' }}</a-tag>
-          </template>
-        </a-table-column>
-        <a-table-column title="公司">
-          <template #cell="{ record }">
-            <a-space wrap>
-              <a-tag v-for="(company, index) of record.companies" :key="index" color="blue" bordered>{{ company.name }}</a-tag>
-            </a-space>
+            <a-tag :color="timeToMis(record.endTime, record.oldRooms).color" bordered>{{ timeToMis(record.endTime, record.oldRooms).str }}</a-tag>
           </template>
         </a-table-column>
         <a-table-column title="操作" data-index="set" :width="200">
           <template #cell="{ record }">
             <a-space wrap>
-              <a-button type="primary" size="small" @click="editBtn(record)">编辑</a-button>
+              <a-button type="primary" size="small" @click="storeBtn(record.id)">编辑</a-button>
               <a-button type="primary" size="small" status="danger">删除</a-button>
             </a-space>
           </template>
         </a-table-column>
       </template>
     </a-table>
-
-    <a-modal v-model:visible="set.visible" :mask-closable="false" :footer="false" @cancel="handleCancel">
-      <template #title> {{ set.title }} </template>
-      <a-form ref="formRef" :model="set.form" @submit="formSubmit">
-        <a-form-item field="id" label="id" style="display: none">
-          <a-input-number v-model="set.form.id" />
-        </a-form-item>
-        <a-form-item field="name" label="姓名" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.name" placeholder="请输入商户姓名" />
-        </a-form-item>
-        <a-form-item field="phone" label="手机号" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.phone" placeholder="请输入商户手机号" />
-        </a-form-item>
-        <a-form-item field="card" label="身份证" :rules="[{ required: true, message: '不能为空' }]">
-          <a-input v-model="set.form.card" placeholder="请输入商户身份证号码" />
-        </a-form-item>
-        <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
-          <a-select v-model="set.form.companies" multiple :options="companyStore.companies.map((item) => ({ value: item.id, label: item.name }))" placeholder="请选择公司" />
-        </a-form-item>
-        <a-form-item field="state" label="状态" :rules="[{ required: true, message: '不能为空' }]">
-          <a-switch v-model="set.form.state" />
-        </a-form-item>
-        <a-form-item>
-          <a-space>
-            <a-button @click="formRef.resetFields()">重置</a-button>
-            <a-button html-type="submit" type="primary">提交</a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
-    </a-modal>
   </section>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { userList, userPostOrPut } from '@/api/caiwu';
-import { debounce } from '@/utils/caiwu';
+import { contractList } from '@/api/caiwu';
+// import { debounce } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
-import type { ICompany } from '@/store/modules/company/types';
 import { useCompanyStore } from '@/store';
 
 const router = useRouter();
@@ -85,64 +52,23 @@ const search = reactive({
   name: '',
   phone: '',
 });
-const set = reactive<{ visible: boolean; title: string; form: { id: number; name: string; phone: string; card: string; state: boolean; companies: { value: number; label: string }[] } }>({
-  visible: false,
-  title: '新增',
-  form: {
-    id: 0,
-    name: '',
-    phone: '',
-    card: '',
-    state: true,
-    companies: [],
-  },
-});
-const formRef = ref();
 const data = reactive<{ count: number; data: IUser[] }>({
   count: 0,
   data: [],
 });
-const getAdminer = async (str = '', page = 1, size = 10) => {
-  const [ret, count] = await userList<[IUser[], number]>(str, page, size);
+const getContractList = async (searchValue = '', page = 1, size = 10) => {
+  const [ret, count] = await contractList<[IUser[], number]>(companyStore.company.id ?? 0, page, size);
   data.count = count;
   data.data = ret;
 };
-getAdminer();
+getContractList();
 
-const storeBtn = () => {
-  router.push({ name: 'contractStore', params: { id: 0 } });
-};
-const editBtn = (record: any) => {
-  set.visible = true;
-  set.title = '编辑';
-  formRef.value.setFields({
-    id: { value: record.id },
-    name: { value: record.name },
-    phone: { value: record.phone },
-    card: { value: record.card },
-    state: { value: record.state },
-    companies: { value: record.companies.map((item: ICompany) => item.id) },
-  });
-};
-
-// 重置表单数据
-const handleCancel = () => {
-  set.visible = false;
-  formRef.value.clearValidate();
-  formRef.value.resetFields();
-};
-
-const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
-  if (val[0].errors) return;
-  await userPostOrPut(val[0].values);
-  handleCancel();
-  getAdminer();
-});
+const storeBtn = (id = 0) => router.push({ name: 'contractStore', params: { id } });
 
 // 分页加载
 const pageChange = (page: number) => {
   search.currentPage = page;
-  getAdminer('', page);
+  getContractList('', page);
 };
 // 关键词搜查
 const searchBtn = () => {
@@ -151,16 +77,45 @@ const searchBtn = () => {
   if (search.phone.length) str.append('phone', search.phone);
   if (str.size > 0) {
     search.currentPage = 1;
-    getAdminer(str.toString(), 1);
+    getContractList(str.toString(), 1);
   }
 };
 const searchReset = () => {
   search.currentPage = 1;
   if (search.name.length || search.phone.length) {
-    getAdminer();
+    getContractList();
   }
   search.name = '';
   search.phone = '';
+};
+// 日期转毫秒
+const timeToMis = (t: string, room = '') => {
+  let str = '正常';
+  let color = 'green';
+  const day = 24 * 60 * 60 * 1000;
+  const time = new Date(t).getTime();
+  const now = Date.now();
+  const sm = time - now;
+  if (room && room.length) {
+    if (sm <= 0) {
+      str = '合同过期';
+      color = '#86909c';
+    } else if (sm / day <= 30) {
+      str = '合同30天内到期';
+    } else if (sm / day <= 20) {
+      str = '合同20天内到期';
+    } else if (sm / day <= 10) {
+      str = '合同10天内到期';
+    } else if (sm / day <= 5) {
+      str = '合同5天内到期';
+    } else if (sm / day <= 3) {
+      str = '合同3天内到期';
+    }
+  } else {
+    str = '合同关闭';
+    color = 'gray';
+  }
+  return { str, color };
 };
 </script>
 

@@ -6,11 +6,21 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
 import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
 import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
 import GlobalSetting from '@/components/global-setting/index.vue';
 import useLocale from '@/hooks/locale';
+import { useUserStore } from './store';
+
+const router = useRouter();
+const userStore = useUserStore();
+onBeforeMount(async () => {
+  if (userStore.role.includes('super') && !router.currentRoute.value.fullPath.includes('workplace')) {
+    router.push({ name: 'Workplace' });
+  }
+});
 
 const { currentLocale } = useLocale();
 const locale = computed(() => {

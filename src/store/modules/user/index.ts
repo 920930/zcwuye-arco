@@ -33,8 +33,9 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    setInfo(partial: Partial<UserState>) {
+    async setInfo(partial: Partial<UserState>) {
       const companyStore = useCompanyStore();
+      await companyStore.setCompanise();
       const { companies } = partial;
       const companyId = companies ? companies[0].id : undefined;
       companyStore.setCompany(companyId);
@@ -50,7 +51,7 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      this.setInfo(res);
+      await this.setInfo(res);
     },
 
     // Login

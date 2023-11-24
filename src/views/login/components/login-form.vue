@@ -61,7 +61,10 @@ const handleSubmit = async ({ errors, values }: { errors: Record<string, Validat
       });
       Message.success(t('login.form.login.success'));
       // 实际生产环境需要进行加密存储。
-    } catch (err) {
+    } catch (err: any) {
+      if (err.message.includes('param')) {
+        router.push({ name: 'Workplace' });
+      }
       errorMessage.value = (err as Error).message;
     } finally {
       setLoading(false);

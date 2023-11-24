@@ -34,7 +34,7 @@
         <a-form-item>
           <a-space>
             <a-button @click="formRef.resetFields()">重置</a-button>
-            <a-button html-type="submit" type="primary" :disabled="subDisabled">提交</a-button>
+            <a-button html-type="submit" type="primary" :loading="loading">提交</a-button>
           </a-space>
         </a-form-item>
       </a-form>
@@ -46,7 +46,9 @@
 import { ref, reactive } from 'vue';
 import { getPermissionList, PermissionPostOrPut, PermissionRemove } from '@/api/user';
 import { debounce } from '@/utils/caiwu';
+import useLoading from '@/hooks/loading';
 
+const { loading, setLoading } = useLoading();
 const set = reactive({
   visible: false,
   title: '新增',
@@ -58,7 +60,6 @@ const set = reactive({
 });
 const formRef = ref();
 const data = ref([]);
-const subDisabled = ref(false);
 const getPermission = async () => {
   data.value = await getPermissionList();
 };
@@ -87,11 +88,11 @@ const handleCancel = () => {
 
 const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
   if (val[0].errors) return;
-  subDisabled.value = true;
+  setLoading(true);
   await PermissionPostOrPut(val[0].values);
   handleCancel();
   getPermission();
-  subDisabled.value = false;
+  setLoading(false);
 });
 
 const delBtn = async (id: number) => {

@@ -146,7 +146,7 @@ const editBtn = (record: IMenu) => {
     'id': { value: record.id },
     'name': { value: record.name },
     'meta.locale': { value: record.meta.locale },
-    'meta.order': { value: record.meta.order },
+    'meta.order': { value: record.meta.order || 1 },
     'meta.icon': { value: record.meta.icon },
     'meta.requiresAuth': { value: record.meta.requiresAuth },
     'meta.hideInMenu': { value: record.meta.hideInMenu },

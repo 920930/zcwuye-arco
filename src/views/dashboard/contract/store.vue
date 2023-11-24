@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCompanyStore } from '@/store';
 import { contractOne, roomList, userSearch, contractPostOrPut } from '@/api/caiwu';
@@ -45,7 +45,7 @@ import type { IContract } from '@/types/caiwu';
 
 const route = useRoute();
 const companyStore = useCompanyStore();
-const id = +(route.params.id as string) || 0;
+const id = ref(0);
 
 const rooms = ref<ITrees[]>();
 const treeCheckStrictly = ref(false);
@@ -55,7 +55,7 @@ const blobs = ref<Blob[]>([]);
 const uploadRef = ref();
 const formRef = ref();
 const form = reactive<IContract>({
-  id,
+  id: id.value,
   rooms: [],
   name: '',
   phone: '',
@@ -65,11 +65,23 @@ const form = reactive<IContract>({
   yyzz: [],
 });
 
+onMounted(() => {
+  id.value = +`${route.params.id}`;
+});
+
 const getOne = async () => {
   const data = await roomList<IRoom[]>(companyStore.company.id ?? 0);
   rooms.value = contractRoomToTree(data, companyStore.company);
-  if (id) {
-    await contractOne(id);
+  if (id.value) {
+    const val = await contractOne<IContract>(id.value);
+    console.log(val);
+    form.id = val.id;
+    form.rooms = val.rooms;
+    form.name = val.name;
+    form.phone = val.phone;
+    form.startTime = val.startTime;
+    form.endTime = val.endTime;
+    form.yyzz = val.yyzz;
   }
 };
 getOne();

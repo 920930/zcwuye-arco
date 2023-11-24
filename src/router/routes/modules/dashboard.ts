@@ -20,15 +20,6 @@ const DASHBOARD: AppRouteRecordRaw = {
       },
     },
     {
-      path: 'user',
-      name: 'user',
-      component: () => import('@/views/dashboard/user/index.vue'),
-      meta: {
-        locale: 'menu.server.user',
-        requiresAuth: true,
-      },
-    },
-    {
       path: 'room',
       name: 'room',
       component: () => import('@/views/dashboard/room/index.vue'),
@@ -43,6 +34,15 @@ const DASHBOARD: AppRouteRecordRaw = {
       component: () => import('@/views/dashboard/room/show.vue'),
       meta: {
         locale: 'menu.server.roomShow',
+        requiresAuth: true,
+      },
+    },
+    {
+      path: 'user',
+      name: 'user',
+      component: () => import('@/views/dashboard/user/index.vue'),
+      meta: {
+        locale: 'menu.server.user',
         requiresAuth: true,
       },
     },
