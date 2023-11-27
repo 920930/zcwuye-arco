@@ -1,10 +1,11 @@
 <template>
   <section class="m-20">
     <a-button class="mb-10" type="primary" @click="storeBtn">新增</a-button>
-    <a-table :data="companyStore.companies" column-resizable :bordered="{ cell: true }">
+    <a-table :data="companies" column-resizable :bordered="{ cell: true }">
       <template #columns>
         <a-table-column title="Id" data-index="id" />
         <a-table-column title="名称" data-index="name" />
+        <a-table-column title="全称" data-index="fname" />
         <a-table-column title="栋" data-index="dong" />
         <a-table-column title="区" data-index="qu" />
         <a-table-column title="区类型" data-index="qutype">
@@ -34,6 +35,12 @@
         <a-form-item field="name" label="公司名称" :rules="[{ required: true, message: '不能为空' }]">
           <a-input v-model="set.form.name" placeholder="公司名称" />
         </a-form-item>
+        <a-form-item field="fname" label="公司全称" :rules="[{ required: true, message: '不能为空' }]">
+          <a-input v-model="set.form.fname" placeholder="公司全称" />
+        </a-form-item>
+        <a-form-item field="bm" label="合同抬头" :rules="[{ required: true, message: '合同开头的编号' }]">
+          <a-input v-model="set.form.bm" placeholder="合同开头的编号" />
+        </a-form-item>
         <a-form-item field="dong" label="栋号" :rules="[{ required: true, message: '不能为空' }]">
           <a-input-number v-model="set.form.dong" placeholder="0栋 表示本项目没有栋号" />
         </a-form-item>
@@ -62,10 +69,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { companyPutOrPost } from '@/api/user';
-import { useCompanyStore } from '@/store';
+import { companyPutOrPost, getCompanyList } from '@/api/user';
+// import { useCompanyStore } from '@/store';
 import { debounce } from '@/utils/caiwu';
-import { ICompany } from '@/store/modules/company/types';
+import type { ICompany } from '@/store/modules/user/types';
+
 const qutype = [
   { value: 1, label: '数字区 如1区 2区' },
   { value: 2, label: '字母区 如A区 B区' },
@@ -73,12 +81,15 @@ const qutype = [
   { value: 4, label: '楼区 如1楼 2楼' },
   { value: 5, label: '特区 如特1区' },
 ];
+const companies = ref<ICompany[]>();
 const set = reactive<{ visible: boolean; title: string; form: ICompany }>({
   visible: false,
   title: '新增',
   form: {
     id: 0,
     name: '',
+    fname: '',
+    bm: '',
     dong: undefined,
     qu: undefined,
     qutype: [],
@@ -86,7 +97,7 @@ const set = reactive<{ visible: boolean; title: string; form: ICompany }>({
     state: true,
   },
 });
-const companyStore = useCompanyStore();
+// const companyStore = useCompanyStore();
 const formRef = ref();
 
 const storeBtn = () => {
@@ -99,6 +110,8 @@ const editBtn = (record: any) => {
   formRef.value.setFields({
     id: { value: record.id },
     name: { value: record.name },
+    fname: { value: record.fname },
+    bm: { value: record.bm },
     dong: { value: record.dong },
     qu: { value: record.qu },
     qutype: { value: record.qutype },
@@ -106,6 +119,11 @@ const editBtn = (record: any) => {
     state: { value: record.state },
   });
 };
+
+const getCompanies = async () => {
+  companies.value = await getCompanyList();
+};
+getCompanies();
 
 // 重置表单数据
 const handleCancel = () => {
@@ -118,7 +136,7 @@ const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
   if (val[0].errors) return;
   await companyPutOrPost(val[0].values);
   handleCancel();
-  companyStore.setCompanise();
+  getCompanies();
 });
 
 const qutypeFn = (val: number[]) => {

@@ -18,22 +18,23 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { useCompanyStore } from '@/store';
+import { useUserStore } from '@/store';
 import { roomList, roomDel } from '@/api/caiwu';
 import type { IRoom } from '@/utils/caiwu';
 import { roomToTree } from '@/utils/caiwu';
-import Item from './item.vue';
-import Edit from './edit.vue';
+import { ICompany } from '@/store/modules/user/types';
+import Item from './IndexItem.vue';
+import Edit from './IndexEdit.vue';
 
 const info = reactive<{ visible: boolean; room: IRoom | undefined }>({
   visible: false,
   room: undefined,
 });
 const rooms = ref<{ [key: string]: IRoom[] }>({});
-const companyStore = useCompanyStore();
+const userStore = useUserStore();
 const getRoomList = async () => {
-  const data = await roomList<IRoom[]>(companyStore.company.id ?? 0);
-  rooms.value = roomToTree(data, companyStore.company);
+  const data = await roomList<IRoom[]>(userStore.company?.id ?? 0);
+  rooms.value = roomToTree(data, userStore.company as ICompany);
 };
 getRoomList();
 

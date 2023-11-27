@@ -55,7 +55,7 @@
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
           <a-select v-model="set.form.companies" multiple placeholder="请选择公司">
-            <a-option v-for="company in companyStore.companies" :key="company.id" :label="company.name" :value="company.id" />
+            <a-option v-for="company in userStore.companies" :key="company.id" :label="company.name" :value="company.id" />
           </a-select>
         </a-form-item>
         <a-form-item field="state" label="状态" :rules="[{ required: true, message: '不能为空' }]">
@@ -74,10 +74,10 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { useCompanyStore } from '@/store';
+import { useUserStore } from '@/store';
 import { getAdminerList, getRoleList, adminerPutOrPost } from '@/api/user';
 import type { IRole, IAdminer } from '@/store/modules/app/types';
-import type { ICompany } from '@/store/modules/company/types';
+import type { ICompany } from '@/store/modules/user/types';
 import { debounce } from '@/utils/caiwu';
 
 const set = reactive({
@@ -94,7 +94,7 @@ const set = reactive({
     companies: [],
   },
 });
-const companyStore = useCompanyStore();
+const userStore = useUserStore();
 const formRef = ref();
 const data = reactive<{ adminers: IAdminer[]; roles: { value: number; label: string }[] }>({
   adminers: [],

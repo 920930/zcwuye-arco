@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 import { login as userLogin, logout as userLogout, getUserInfo, LoginData } from '@/api/user';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { UserState } from './types';
+// import { useStorageAsync } from '@vueuse/core';
+import { type UserState } from './types';
 import useAppStore from '../app';
-import useCompanyStore from '../company';
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
@@ -13,7 +13,7 @@ const useUserStore = defineStore('user', {
     avatar: undefined,
     job: undefined,
     companies: [],
-    companyId: undefined,
+    company: undefined,
     introduction: undefined,
     phone: undefined,
     role: '',
@@ -33,16 +33,22 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    async setInfo(partial: Partial<UserState>) {
-      const companyStore = useCompanyStore();
-      await companyStore.setCompanise();
+    setInfo(partial: Partial<UserState>) {
+      // const companyStore = useCompanyStore();
       const { companies } = partial;
-      const companyId = companies ? companies[0].id : undefined;
-      companyStore.setCompany(companyId);
-      const ret = { ...partial, companyId };
+      // const companyId = companies ? companies[0].id : undefined;
+      // companyStore.setCompany(companyId);
+      const company = companies?.[0];
+      // companyInfo.value = useStorageAsync('company', company);
+      const ret = { ...partial, company };
       this.$patch(ret);
     },
 
+    setCompany(id: number) {
+      const company = this.companies.find((item) => item.id === id);
+      // companyInfo.value = company;
+      this.$patch({ company });
+    },
     // Reset user's information
     resetInfo() {
       this.$reset();
@@ -51,14 +57,14 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      await this.setInfo(res);
+      this.setInfo(res);
     },
 
     // Login
     async login(loginForm: LoginData) {
       try {
-        const token = await userLogin(loginForm);
-        setToken(token);
+        const res = await userLogin(loginForm);
+        setToken(res);
       } catch (err) {
         clearToken();
         throw err;

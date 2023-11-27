@@ -19,6 +19,8 @@ export const roomList = <T>(companyId: number) => http.get<T>(`/room?companyId=$
 export const roomPostOrPut = <T>(data: any) => {
   return data.id ? http.patch<T>(`/room/${data.id}`, data) : http.post<T>('/room', data);
 };
+// 商铺 - 内页
+export const roomShow = <T>(id: number, cid = 0) => http.get<T>(`/room/${id}?cid=${cid}`);
 // 商铺 - 删除
 export const roomDel = <T>(id: number) => http.delete<T>(`/room/${id}`);
 // ====================
@@ -27,8 +29,11 @@ export const contractList = <T>(companyId: number, page = 1, size = 10) => http.
 // 合同 - 单个
 export const contractOne = <T>(id: number) => http.get<T>(`/contract/${id}`);
 // 合同 - 编辑或新增
-export const contractPostOrPut = <T>(data: any) => {
-  return data.id ? http.patch<T>(`/contract/${data.id}`, data, { headers: { 'content-type': 'multipart/form-data' } }) : http.post<T>('/contract', data, { headers: { 'content-type': 'multipart/form-data' } });
+export const contractPostOrPut = <T>(data: FormData) => {
+  const id = data.get('id');
+  return id !== '0' ? http.patch<T>(`/contract/${id}`, data, { headers: { 'content-type': 'multipart/form-data' } }) : http.post<T>('/contract', data, { headers: { 'content-type': 'multipart/form-data' } });
 };
 // 合同 - 删除
 export const contractDel = <T>(id: number) => http.delete<T>(`/contract/${id}`);
+// 图片删除
+export const delImg = (id: number, img?: string) => http.delete(`/contract/img?id=${id}&img=${img}`);

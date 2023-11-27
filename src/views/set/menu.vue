@@ -56,7 +56,7 @@
         </a-form-item>
         <a-form-item field="company" label="所属公司" :rules="[{ required: true, message: '不能为空' }]">
           <a-select v-model="modal.form.company" multiple>
-            <a-option v-for="company in companyStore.companies" :key="company.id" :label="company.name" :value="company.id" />
+            <a-option v-for="company in data.companies" :key="company.id" :label="company.name" :value="company.id" />
           </a-select>
         </a-form-item>
         <a-form-item field="parent" label="父级路由">
@@ -78,18 +78,19 @@
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
-import { getMenuList, getRoleList, menuPostOrPut } from '@/api/user';
-import { useUserStore, useAppStore, useCompanyStore } from '@/store';
+import { getMenuList, getRoleList, menuPostOrPut, getCompanyList } from '@/api/user';
+import { useUserStore, useAppStore } from '@/store';
 import type { IMenu, IRole, IOptions } from '@/store/modules/app/types';
+import type { ICompany } from '@/store/modules/user/types';
 import { menuToOption } from '@/utils';
 import { debounce } from '@/utils/caiwu';
 
 const appStore = useAppStore();
 const userStore = useUserStore();
-const companyStore = useCompanyStore();
 
-const data = reactive<{ menu: IMenu[]; roles: IRole[]; menuOption: IOptions[] }>({
+const data = reactive<{ menu: IMenu[]; companies: ICompany[]; roles: IRole[]; menuOption: IOptions[] }>({
   menu: [],
+  companies: [],
   roles: [],
   menuOption: [],
 });
@@ -99,13 +100,14 @@ const getMenuBtn = async () => {
 };
 getMenuBtn();
 const getRoleAdCompany = async () => {
+  data.companies = await getCompanyList();
   data.roles = await getRoleList<IRole[]>();
 };
 getRoleAdCompany();
 // 公司名称
 const findCompanyName = (coms: number[]) => {
   const set = new Set(coms);
-  return userStore.companies.filter((item) => set.has(item.id));
+  return data.companies.filter((item) => set.has(item.id ?? 0));
 };
 
 const formRef = ref();
@@ -146,7 +148,7 @@ const editBtn = (record: IMenu) => {
     'id': { value: record.id },
     'name': { value: record.name },
     'meta.locale': { value: record.meta.locale },
-    'meta.order': { value: record.meta.order || 1 },
+    'meta.order': { value: record.meta.order },
     'meta.icon': { value: record.meta.icon },
     'meta.requiresAuth': { value: record.meta.requiresAuth },
     'meta.hideInMenu': { value: record.meta.hideInMenu },
@@ -167,6 +169,6 @@ const formSubmit = debounce(async (val: { values: any; errors: any }[]) => {
   await menuPostOrPut(val[0].values);
   handleCancel();
   getMenuBtn();
-  appStore.fetchServerMenuConfig(userStore.companyId);
+  appStore.fetchServerMenuConfig(userStore.company?.id);
 });
 </script>

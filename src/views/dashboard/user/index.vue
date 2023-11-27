@@ -54,7 +54,7 @@
           <a-input v-model="set.form.card" placeholder="请输入商户身份证号码" />
         </a-form-item>
         <a-form-item field="companies" label="公司" :rules="[{ required: true, message: '不能为空' }]">
-          <a-select v-model="set.form.companies" multiple :options="companyStore.companies.map((item) => ({ value: item.id, label: item.name }))" placeholder="请选择公司" />
+          <a-select v-model="set.form.companies" multiple :options="userStore.companies.map((item) => ({ value: item.id, label: item.name }))" placeholder="请选择公司" />
         </a-form-item>
         <a-form-item field="state" label="状态" :rules="[{ required: true, message: '不能为空' }]">
           <a-switch v-model="set.form.state" />
@@ -75,16 +75,20 @@ import { ref, reactive } from 'vue';
 import { userList, userPostOrPut } from '@/api/caiwu';
 import { debounce } from '@/utils/caiwu';
 import type { IUser } from '@/store/modules/app/types';
+import { useUserStore } from '@/store';
 import type { ICompany } from '@/store/modules/company/types';
-import { useCompanyStore } from '@/store';
 
-const companyStore = useCompanyStore();
+const userStore = useUserStore();
 const search = reactive({
   currentPage: 1,
   name: '',
   phone: '',
 });
-const set = reactive<{ visible: boolean; title: string; form: { id: number; name: string; phone: string; card: string; state: boolean; companies: { value: number; label: string }[] } }>({
+const set = reactive<{
+  visible: boolean;
+  title: string;
+  form: { id: number; name: string; phone: string; card: string; state: boolean; companies: { value: number; label: string }[] };
+}>({
   visible: false,
   title: '新增',
   form: {

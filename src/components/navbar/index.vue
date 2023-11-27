@@ -3,8 +3,8 @@
     <div class="left-side">
       <a-space>
         <img alt="logo" src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image" />
-        <a-typography-title v-show="appStore.device === 'desktop'" :style="{ margin: 0, fontSize: '18px' }" :heading="5"> Arco Pro </a-typography-title>
-        <a-select :default-value="userStore.companyId" @change="selectFn">
+        <a-typography-title :style="{ margin: 0, fontSize: '18px' }" :heading="5"> Arco Pro </a-typography-title>
+        <a-select :default-value="userStore.company?.id" @change="selectFn">
           <a-option v-for="item in userStore.companies" :key="item.id" :value="item.id" :label="item.name" />
         </a-select>
         <icon-menu-fold v-if="!topMenu && appStore.device === 'mobile'" style="font-size: 22px; cursor: pointer" @click="toggleDrawerMenu" />
@@ -136,10 +136,10 @@
 
 <script lang="ts" setup>
 import { computed, ref, inject } from 'vue';
+import { useRouter } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
 import { useDark, useToggle, useFullscreen } from '@vueuse/core';
-import { useAppStore, useUserStore, useTabBarStore, useCompanyStore } from '@/store';
-import { useRoute, useRouter } from 'vue-router';
+import { useAppStore, useUserStore, useTabBarStore } from '@/store';
 import { LOCALE_OPTIONS } from '@/locale';
 import useLocale from '@/hooks/locale';
 import useUser from '@/hooks/user';
@@ -149,14 +149,17 @@ import MessageBox from '../message-box/index.vue';
 const appStore = useAppStore();
 const userStore = useUserStore();
 const tabbarStore = useTabBarStore();
-const companyStore = useCompanyStore();
 const router = useRouter();
 const { logout } = useUser();
 const { changeLocale, currentLocale } = useLocale();
 const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
 const locales = [...LOCALE_OPTIONS];
-const avatar = computed(() => userStore.avatar);
-const theme = computed(() => appStore.theme);
+const avatar = computed(() => {
+  return userStore.avatar;
+});
+const theme = computed(() => {
+  return appStore.theme;
+});
 const topMenu = computed(() => appStore.topMenu && appStore.menu);
 const isDark = useDark({
   selector: 'body',
@@ -204,8 +207,9 @@ const switchRoles = async () => {
 const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 
 const selectFn = (id: any) => {
-  userStore.companyId = id;
-  companyStore.setCompany(id);
+  // userStore.companyId = id;
+  userStore.setCompany(id);
+  // companyStore.setCompany(id);
   appStore.fetchServerMenuConfig(id);
   tabbarStore.resetTabList();
   if (!router.currentRoute.value.path.includes('/dashboard/workplace')) {
