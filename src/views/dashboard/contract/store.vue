@@ -126,10 +126,6 @@ const searchUser = async (val: string) => {
 const handleSubmit = async (val: any) => {
   const { errors, values } = val;
   if (errors) return;
-  if (values.rooms.length === 0) {
-    Message.warning('请勾选店铺');
-    return;
-  }
   btnDisabled.value = true;
   // 图片提交，触发对应组件按钮
   uploadRef.value.submit();

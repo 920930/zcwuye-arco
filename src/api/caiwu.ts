@@ -13,6 +13,7 @@ export const userPostOrPut = <T>(data: any) => {
 // 商户 - 搜索
 export const userSearch = <T>(str: string) => http.get<T>(`/user/search?val=${str}`);
 // ====================
+// ====================
 // 商铺 - 列表
 export const roomList = <T>(companyId: number) => http.get<T>(`/room?companyId=${companyId}`);
 // 商铺 - 编辑或新增
@@ -24,8 +25,9 @@ export const roomShow = <T>(id: number, cid = 0) => http.get<T>(`/room/${id}?cid
 // 商铺 - 删除
 export const roomDel = <T>(id: number) => http.delete<T>(`/room/${id}`);
 // ====================
+// ====================
 // 合同 - 列表
-export const contractList = <T>(companyId: number, page = 1, size = 10) => http.get<T>(`/contract?companyId=${companyId}&page=${page}&size=${size}`);
+export const contractList = <T>(str = '') => http.get<T>(`/contract?${str}`);
 // 合同 - 单个
 export const contractOne = <T>(id: number) => http.get<T>(`/contract/${id}`);
 // 合同 - 编辑或新增
@@ -35,5 +37,7 @@ export const contractPostOrPut = <T>(data: FormData) => {
 };
 // 合同 - 删除
 export const contractDel = <T>(id: number) => http.delete<T>(`/contract/${id}`);
+// ====================
+// ====================
 // 图片删除
 export const delImg = (id: number, img?: string) => http.delete(`/contract/img?id=${id}&img=${img}`);

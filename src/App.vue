@@ -51,4 +51,9 @@ const locale = computed(() => {
   background-color: white;
   border-radius: 5px;
 }
+
+ul {
+  margin: 0;
+  padding: 0;
+}
 </style>

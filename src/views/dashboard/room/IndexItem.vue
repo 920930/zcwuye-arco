@@ -36,7 +36,7 @@
         </a-popconfirm>
 
         <a-button type="dashed" status="warning" size="small" @click="$emit('editFn', room.id)">编辑</a-button>
-        <a-button type="dashed" status="success" size="small" @click="navigatorFn">进入</a-button>
+        <a-button v-if="props.room.contract?.id" type="dashed" status="success" size="small" @click="navigatorFn">进入</a-button>
       </a-space>
     </section>
   </section>
@@ -62,7 +62,7 @@ const dongqunum = computed(() => {
 });
 
 const navigatorFn = () => {
-  router.push({ name: 'roomShow', params: { id: props.room.id, cid: props.room.contract?.id || 0 } });
+  router.push({ name: 'contractShow', params: { id: props.room.contract?.id || 0 } });
 };
 </script>
 
