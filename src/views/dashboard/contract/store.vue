@@ -15,6 +15,12 @@
       <a-form-item field="name" label="商铺名称" tooltip="请输入商铺名称" :rules="[{ required: true, message: '商铺名称不能为空' }]">
         <a-input v-model="form.name" placeholder="请输入商铺名称（暂无请填写老板姓名）" />
       </a-form-item>
+      <a-form-item field="area" label="总面积" tooltip="请输入租赁总面积" :rules="[{ required: true, message: '商铺名称不能为空' }]">
+        <a-input-number v-model="form.area" placeholder="请输入租赁总面积，含公摊" />
+      </a-form-item>
+      <a-form-item field="price" label="租金单价" tooltip="请输入商铺租金单价" :rules="[{ required: true, message: '商铺名称不能为空' }]">
+        <a-input-number v-model="form.price" placeholder="商铺租金单价 多少元/㎡" />
+      </a-form-item>
       <a-form-item field="userId" label="签约老板" tooltip="没有请在商户列表 新增商户" :rules="[{ required: true, message: '请选择老板' }]">
         <a-select v-model="form.userId" :options="userOptions" placeholder="通过手机或姓名搜索老板" allow-search allow-clear @search="searchUser" />
       </a-form-item>
@@ -54,6 +60,8 @@ interface IForm {
   rooms: string[];
   bianma: string;
   name: string;
+  area?: number;
+  price?: number;
   userId: string;
   startTime: string;
   endTime: string;
@@ -85,6 +93,8 @@ const form = reactive<IForm>({
   rooms: [],
   bianma: bm.value,
   name: '',
+  area: undefined,
+  price: undefined,
   userId: '',
   startTime: '',
   endTime: '',
@@ -95,6 +105,8 @@ const getOne = async () => {
   const data = await roomList<IRoom[]>(userStore.company?.id ?? 0);
   if (id) {
     const val = await contractOne<IForm>(id);
+    console.log(val);
+    console.log(val.price, typeof val.price);
     const { user } = val as any;
     rooms.value = contractRoomToTree(data, userStore.company as ICompany, new Set(val.rooms));
     form.id = val.id;
@@ -105,6 +117,8 @@ const getOne = async () => {
     form.startTime = val.startTime;
     form.endTime = val.endTime;
     form.yyzz = val.yyzz;
+    form.price = val.price;
+    form.area = val.area;
 
     userOptions.value = [{ label: `${user.name} - ${user.phone}`, value: `${user.id}` }];
     fileList.value = val.yyzz.map((item) => ({ uid: Math.random().toString().slice(2), name: item, url: item }));

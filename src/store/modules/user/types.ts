@@ -16,6 +16,7 @@ export interface UserState {
   id?: number;
   name?: string;
   avatar?: string;
+  card?: string;
   job?: string;
   jobName?: string;
   companies: ICompany[];

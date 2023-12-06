@@ -58,12 +58,33 @@ export const adminerPutOrPost = <T>(data: ICompany) => {
 };
 
 // 权限 - 列表
-export const getPermissionList = <T>() => {
-  return http.get<T>('/permission');
-};
+export const getPermissionList = <T>() => http.get<T>('/permission');
 // 权限 - 编辑或新增
 export const PermissionPostOrPut = <T>(data: IRole) => {
   return data.id ? http.put<T>(`/permission/${data.id}`, data) : http.post<T>('/permission', data);
 };
 // 权限 - 删除
 export const PermissionRemove = (id: number) => http.delete(`/permission/${id}`);
+
+/**
+ * 费用类型API
+ */
+export const getCostypeList = <T>(state?: boolean) => {
+  let url = '/costype';
+  if (state !== undefined) url += `?state=${state}`;
+  return http.get<T>(url);
+};
+export const CostypePostOrPut = <T>(data: IRole) => {
+  return data.id ? http.put<T>(`/costype/${data.id}`, data) : http.post<T>('/costype', data);
+};
+/**
+ * 费用列表API
+ */
+export const getCostList = <T>(contractId: number, costypeId = 0) => {
+  let url = `/cost?contractId=${contractId}`;
+  if (costypeId) url += `&costypeId=${costypeId}`;
+  return http.get<T>(url);
+};
+export const CostPostOrPut = <T>(data: IRole, config = false) => {
+  return data.id ? http.put<T>(`/cost/${data.id}`, data, config) : http.post<T>('/cost', data);
+};

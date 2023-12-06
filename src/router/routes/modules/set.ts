@@ -57,6 +57,15 @@ const DASHBOARD: AppRouteRecordRaw = {
         requiresAuth: true,
       },
     },
+    {
+      path: 'costype',
+      name: 'costype',
+      component: () => import('@/views/set/costype.vue'),
+      meta: {
+        locale: '费用类型',
+        requiresAuth: true,
+      },
+    },
   ],
 };
 

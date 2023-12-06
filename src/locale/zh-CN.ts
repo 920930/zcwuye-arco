@@ -15,6 +15,7 @@ export default {
   'menu.server.menu': '菜单列表',
   'menu.server.role': '角色列表',
   'menu.server.permission': '权限列表',
+  'menu.server.costype': '费用类型',
   'menu.server.adminer': '员工列表',
   'menu.server.room': '商铺列表',
   'menu.server.roomShow': '商铺内页',

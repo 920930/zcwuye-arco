@@ -13,3 +13,12 @@ export interface IContract {
   yyzz: string[];
   user?: UserState;
 }
+
+export interface ICost {
+  id: number;
+  price: number;
+  state: string;
+  end: string;
+  desc: string;
+  costypeId: number;
+}
