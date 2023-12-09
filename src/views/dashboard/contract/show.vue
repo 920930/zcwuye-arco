@@ -41,11 +41,11 @@
         <section>
           <a-space size="large">
             <a-space>
-              <a-select v-model="searchValue.type" placeholder="费用分类" :options="typeData" style="width: 200px" />
+              <a-select v-model="searchValue.type" placeholder="费用分类" :options="costypeData" style="width: 200px" />
               <a-button type="primary" status="success" @click="searchBtn">搜索</a-button>
               <a-button @click="resetBtn">重置</a-button>
             </a-space>
-            <a-button type="primary" status="danger" @click="costVisible = true">新增</a-button>
+            <a-button type="primary" status="danger" @click="costForm.visible = true">新增</a-button>
           </a-space>
         </section>
       </section>
@@ -79,21 +79,21 @@
       </a-table>
     </section>
 
-    <a-modal v-model:visible="costVisible" title="收费" :footer="false" draggable @cancel="costCancel">
+    <a-modal v-model:visible="costForm.visible" title="收费" :footer="false" draggable @cancel="costCancel">
       <a-form ref="costFormRef" :model="costform" @submit="costOk">
         <a-form-item field="id" label="id" style="display: none">
           <a-input-number v-model="costform.id" placeholder="id" />
         </a-form-item>
         <a-form-item field="costypeId" label="费用类型">
-          <a-select v-model="costform.costypeId" placeholder="请选择费用类型" :options="typeData" />
+          <a-select v-model="costform.costypeId" placeholder="请选择费用类型" :options="costypeData" @change="costypeChange" />
         </a-form-item>
         <a-form-item field="price" label="金额" required>
           <a-input-number v-model="costform.price" placeholder="收费金额" />
         </a-form-item>
-        <a-form-item field="start" label="开始时间" required>
+        <a-form-item v-show="costForm.showTime" field="start" label="开始时间" required>
           <a-date-picker v-model="costform.start" />
         </a-form-item>
-        <a-form-item field="end" label="结束时间" required>
+        <a-form-item v-show="costForm.showTime" field="end" label="结束时间" required>
           <a-date-picker v-model="costform.end" />
         </a-form-item>
         <a-form-item field="desc" label="备注说明">
@@ -125,12 +125,15 @@ const searchValue = reactive({
   type: undefined,
 });
 const contract = ref<IContract>();
-const costVisible = ref(false);
+const costForm = reactive({
+  visible: false,
+  showTime: true,
+});
 const cost = reactive<{ datas: ICost[]; count: number }>({
   datas: [],
   count: 0,
 });
-const typeData = ref<{ value: number; label: string }[]>([
+const costypeData = ref<{ value: number; label: string; dtime: boolean }[]>([
   // { value: 1, label: '房租' },
   // { value: 2, label: '电费' },
   // { value: 3, label: '水费' },
@@ -154,8 +157,8 @@ const getContract = async () => {
   // 合同信息
   contract.value = await contractOne(costform.contractId);
   // 费用类目
-  const costypeListData = await getCostypeList<{ id: number; title: string }[]>();
-  typeData.value = costypeListData.map((item) => ({ value: item.id, label: item.title }));
+  const costypeListData = await getCostypeList<{ id: number; title: string; dtime: boolean }[]>();
+  costypeData.value = costypeListData.map((item) => ({ value: item.id, label: item.title, dtime: item.dtime }));
 };
 // 费用列表 cId是合同Id, costypeId是费用类型id
 const costListFn = async (cId: number, costypeId = 0) => {
@@ -180,7 +183,7 @@ const costOk = async ({ values, errors }: { values: any; errors: any }) => {
   try {
     await CostPostOrPut(values, true);
     costListFn(costform.contractId);
-    costVisible.value = false;
+    costForm.visible = false;
   } catch (error) {
     window.console.log(error);
   } finally {
@@ -190,7 +193,8 @@ const costOk = async ({ values, errors }: { values: any; errors: any }) => {
 // 关闭modal后数据重置
 const costCancel = () => costFormRef.value.resetFields();
 const editCostBtn = (record: any) => {
-  costVisible.value = true;
+  costForm.showTime = record.costype.dtime;
+  costForm.visible = true;
   costFormRef.value.setFields({
     id: { value: record.id },
     price: { value: record.price },
@@ -203,7 +207,15 @@ const editCostBtn = (record: any) => {
 const delCostBtn = (item: any) => {};
 
 const searchBtn = () => costListFn(costform.contractId, searchValue.type);
-const resetBtn = () => costListFn(costform.contractId);
+const resetBtn = () => {
+  costListFn(costform.contractId);
+  searchValue.type = undefined;
+};
+
+const costypeChange = (e: any) => {
+  const costOne = costypeData.value.find((item) => item.value === e);
+  costForm.showTime = costOne ? costOne.dtime : true;
+};
 </script>
 
 <style lang="less" scoped>

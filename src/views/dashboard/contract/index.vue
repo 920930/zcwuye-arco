@@ -63,7 +63,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const search = reactive({
   page: 1,
-  size: 2,
+  size: 20,
   name: '',
   username: '',
   userphone: '',

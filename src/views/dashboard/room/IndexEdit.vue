@@ -16,12 +16,6 @@
       <a-form-item field="num" label="号" :rules="[{ required: true, message: '不能为空' }]">
         <a-input v-model="data.num" placeholder="请输入号" />
       </a-form-item>
-      <a-form-item field="area" label="面积" :rules="[{ required: true, message: '不能为空' }]">
-        <a-input-number v-model="data.area" placeholder="请输入商铺面积" />
-      </a-form-item>
-      <a-form-item field="price" label="单价" :rules="[{ required: true, message: '不能为空' }]">
-        <a-input-number v-model="data.price" placeholder="请输入商铺单价" />
-      </a-form-item>
       <a-form-item>
         <a-space>
           <a-button @click="formRef.resetFields()">重置</a-button>
@@ -65,8 +59,6 @@ const data = reactive<Partial<IRoom> & { companyId?: number }>({
   dong: undefined,
   qu: undefined,
   num: undefined,
-  price: undefined,
-  area: undefined,
   companyId: userStore.company?.id,
 });
 const setValues = (val: IRoom | undefined) => {
@@ -75,8 +67,6 @@ const setValues = (val: IRoom | undefined) => {
     dong: { value: val?.dong },
     qu: { value: val?.qu },
     num: { value: val?.num },
-    price: { value: val?.price },
-    area: { value: val?.area },
   });
 };
 watch(
