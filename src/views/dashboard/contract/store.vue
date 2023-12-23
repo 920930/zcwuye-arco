@@ -93,8 +93,6 @@ const form = reactive<IForm>({
   rooms: [],
   bianma: bm.value,
   name: '',
-  area: undefined,
-  price: undefined,
   userId: '',
   startTime: '',
   endTime: '',

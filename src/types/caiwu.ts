@@ -8,6 +8,8 @@ export interface IContract {
   oldRooms: string;
   phone: string;
   userId: string;
+  price: number;
+  area: number;
   startTime: string;
   endTime: string;
   yyzz: string[];
@@ -21,4 +23,13 @@ export interface ICost {
   end: string;
   desc: string;
   costypeId: number;
+}
+
+export interface IConList {
+  id: number;
+  startTime: string;
+  endTime: string;
+  desc: string;
+  contractId: number;
+  contract: IContract;
 }

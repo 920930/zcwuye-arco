@@ -80,8 +80,8 @@ export const CostypePostOrPut = <T>(data: IRole) => {
 /**
  * 费用列表API
  */
-export const getCostList = <T>(contractId: number, costypeId = 0) => {
-  let url = `/cost?contractId=${contractId}`;
+export const getCostList = <T>(contractId: number, costypeId = 0, page = 1, size = 20) => {
+  let url = `/cost?contractId=${contractId}&page=${page}&size=${size}`;
   if (costypeId) url += `&costypeId=${costypeId}`;
   return http.get<T>(url);
 };

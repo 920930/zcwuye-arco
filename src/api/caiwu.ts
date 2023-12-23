@@ -41,3 +41,10 @@ export const contractDel = <T>(id: number) => http.delete<T>(`/contract/${id}`);
 // ====================
 // 图片删除
 export const delImg = (id: number, img?: string) => http.delete(`/contract/img?id=${id}&img=${img}`);
+
+// 合同下级分类 续签合同
+export const conLists = <T>(cid: number, page = 1, size = 20) => http.get<T>(`/conlist?contractId=${cid}&page=${page}&size=${size}`);
+export const conListPostOrPut = <T>(data: any) => {
+  return data.id ? http.patch<T>(`/conlist/${data.id}`, data) : http.post<T>('/conlist', data);
+};
+export const conListDel = (id: number) => http.delete(`/conlist/${id}`);
