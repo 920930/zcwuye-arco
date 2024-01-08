@@ -187,7 +187,7 @@ export const debounce = (fn: (val: any) => void, dafly = 800) => {
   };
 };
 
-export const tinyCanvas = (blob: Blob, quality = 60, width = 1000): Promise<Blob> => {
+export const tinyCanvas = (blob: Blob, quality = 60, width = 1000): Promise<File> => {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
@@ -206,7 +206,7 @@ export const tinyCanvas = (blob: Blob, quality = 60, width = 1000): Promise<Blob
       // 输出为base64图片
       // canvas.toDataURL('jpg', quality / 100);
       // 输出为blob, quality为0-1区间
-      canvas.toBlob((file) => resolve(file as Blob), blob.type, quality / 100);
+      canvas.toBlob((file) => resolve(file as File), blob.type, quality / 100);
     });
   });
 };

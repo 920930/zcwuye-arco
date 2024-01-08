@@ -54,12 +54,10 @@
     <a-modal :visible="info.ht" fullscreen title="合同图片列表" :footer="false" @cancel="htCancel">
       <section class="ht">
         <div class="ht-left">
-          <a-upload ref="htuploadRef" list-type="picture" :auto-upload="false" multiple :default-file-list="htImgs">
-            <template #upload-item> 123 </template>
-          </a-upload>
+          <a-upload ref="htuploadRef" :action="htUpload.action" :headers="htUpload.headers" list-type="picture" multiple :default-file-list="htImgs" @before-upload="beforeUp" />
         </div>
         <article class="ht-right">
-          <a-carousel auto-play :style="{ height: htHeight + 'px' }">
+          <a-carousel auto-play :style="{ height: htUpload.height + 'px' }">
             <a-carousel-item v-for="image in htImgs" :key="image.uid">
               <img :src="image.url" :style="{ width: '100%' }" />
             </a-carousel-item>
@@ -75,6 +73,8 @@ import { onMounted, ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { conLists, conListPostOrPut, conListDel } from '@/api/caiwu';
 import type { IConList } from '@/types/caiwu';
+import { tinyCanvas } from '@/utils/caiwu';
+import { getToken } from '@/utils/auth';
 import useLoading from '@/hooks/loading';
 
 const route = useRoute();
@@ -89,18 +89,30 @@ const conlistData = reactive<{ values: IConList[]; total: number }>({
   values: [],
   total: 0,
 });
-const conlist = reactive({
+const conlist = reactive<{
+  contractId: number;
+  id: number;
+  startTime: string;
+  endTime: string;
+  desc: string;
+  imgs: string[];
+}>({
   contractId: 0,
   id: 0,
   startTime: '',
   endTime: '',
-  area: undefined,
-  price: undefined,
   desc: '',
+  imgs: [],
 });
 const htImgs = ref<{ uid: string; name: string; url: string }[]>([]);
 const htuploadRef = ref();
-const htHeight = ref(0);
+const htUpload = reactive({
+  height: 0,
+  action: '',
+  headers: {
+    Authorization: '',
+  },
+});
 const { loading, setLoading } = useLoading();
 
 const getConList = async () => {
@@ -111,7 +123,8 @@ const getConList = async () => {
 onMounted(() => {
   conlist.contractId = +`${route.params.id}`;
   getConList();
-  htHeight.value = document.documentElement.clientHeight - 200;
+  htUpload.height = document.documentElement.clientHeight - 200;
+  htUpload.headers.Authorization = getToken() || '';
 });
 // 表单编辑
 const editFn = (record: any) => {
@@ -149,22 +162,28 @@ const pageChange = (num: number) => {
   info.page = num;
   getConList();
 };
-// 合同modal关闭
+// 合同modal界面关闭
 const htCancel = () => {
+  htImgs.value.length = 0;
   info.ht = false;
-  htImgs.value = [];
 };
 // 合同列表查看
-const htBtn = (img: string[]) => {
+const htBtn = (record: any) => {
+  htUpload.action = `${import.meta.env.VITE_API_BASE_URL}/api/conlist/upload/${record.id}`;
+  if (record.imgs) {
+    const ret: { uid: string; name: string; url: string }[] = [];
+    record.imgs.forEach((url: string) => {
+      const arr = url.split('/');
+      const uid = arr[arr.length - 1];
+      ret.push({ uid, name: uid, url });
+    });
+    htImgs.value.push(...ret);
+  }
+
   info.ht = true;
-  htImgs.value = [
-    { uid: '1', name: '123', url: 'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/cd7a1aaea8e1c5e3d26fe2591e561798.png~tplv-uwbnlip3yd-webp.webp' },
-    { uid: '2', name: '222', url: 'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/6480dbc69be1b5de95010289787d64f1.png~tplv-uwbnlip3yd-webp.webp' },
-    { uid: '3', name: '333', url: 'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/0265a04fddbd77a19602a15d9d55d797.png~tplv-uwbnlip3yd-webp.webp' },
-  ];
-  console.log(htuploadRef.value);
-  htuploadRef.value.defaultFileList.push(...htImgs.value);
 };
+// 图片上传前压缩图片
+const beforeUp = (file: File) => tinyCanvas(file);
 </script>
 
 <style lang="less" scoped>

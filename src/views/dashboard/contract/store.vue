@@ -103,8 +103,6 @@ const getOne = async () => {
   const data = await roomList<IRoom[]>(userStore.company?.id ?? 0);
   if (id) {
     const val = await contractOne<IForm>(id);
-    console.log(val);
-    console.log(val.price, typeof val.price);
     const { user } = val as any;
     rooms.value = contractRoomToTree(data, userStore.company as ICompany, new Set(val.rooms));
     form.id = val.id;

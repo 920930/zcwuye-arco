@@ -30,6 +30,7 @@ export interface IConList {
   startTime: string;
   endTime: string;
   desc: string;
+  imgs: string[];
   contractId: number;
   contract: IContract;
 }

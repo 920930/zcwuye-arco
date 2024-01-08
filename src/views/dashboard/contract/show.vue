@@ -13,11 +13,16 @@
         </li>
         <li class="li">
           <a-space class="li-left">
-            <span class="bold">合同编号：</span><span class="gray">{{ contract?.bianma }}</span>
+            <span class="bold">项目简称：</span><span class="gray">{{ userStore.company?.name }}</span>
           </a-space>
           <a-space>
             <span class="bold">入驻门店：</span>
             <a-tag v-for="item in contract?.oldRooms.split(',')" :key="item" color="purple" size="small">{{ item }}</a-tag>
+          </a-space>
+        </li>
+        <li class="li">
+          <a-space class="li-left">
+            <span class="bold">合同编号：</span><span class="gray">{{ contract?.bianma }}</span>
           </a-space>
         </li>
         <a-divider orientation="left"><icon-star /></a-divider>
@@ -45,6 +50,21 @@
             <span class="bold">租赁单价：</span><span class="gray">{{ contract?.price }} 元/㎡</span>
           </a-space>
         </li>
+        <a-divider orientation="left"><icon-star /></a-divider>
+        <li class="li">
+          <a-space class="li-left">
+            <span class="bold">老板姓名：</span><span class="gray">{{ contract?.user?.name }}</span>
+          </a-space>
+          <a-space>
+            <span class="bold">老板手机：</span><span class="gray">{{ contract?.user?.phone }}</span>
+          </a-space>
+        </li>
+        <li class="li">
+          <a-space class="li-left">
+            <span class="bold">身份证号：</span><span class="gray">{{ contract?.user?.card }}</span>
+          </a-space>
+        </li>
+        <a-divider orientation="left"><icon-star /></a-divider>
         <li class="li">
           <router-link :to="{ name: 'contractStore', params: { id: contract?.id } }">编辑</router-link>
         </li>
@@ -52,16 +72,6 @@
       <a-carousel auto-play :style="{ width: '600px' }">
         <a-carousel-item v-for="image in contract?.yyzz" :key="image"> <img :src="image" :style="{ width: '100%' }" /> </a-carousel-item>
       </a-carousel>
-    </ul>
-    <ul class="bg-white p-20 mb-20">
-      <li class="li">
-        <a-space class="li-left">老板姓名：{{ contract?.user?.name }}</a-space>
-        <a-space class="li-left">
-          <span>老板手机：</span>
-          <span style="color: red">{{ contract?.user?.phone }}</span>
-        </a-space>
-        <a-space>身份证：{{ contract?.user?.card }}</a-space>
-      </li>
     </ul>
     <ConList />
     <Cost :contract="contract" />
@@ -84,11 +94,7 @@ const contract = ref<IContract>();
 const getContract = async (id: number) => {
   contract.value = await contractOne(id);
 };
-const images = [
-  'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/cd7a1aaea8e1c5e3d26fe2591e561798.png~tplv-uwbnlip3yd-webp.webp',
-  'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/6480dbc69be1b5de95010289787d64f1.png~tplv-uwbnlip3yd-webp.webp',
-  'https://p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/0265a04fddbd77a19602a15d9d55d797.png~tplv-uwbnlip3yd-webp.webp',
-];
+
 onMounted(() => {
   getContract(+`${route.params.id}`);
 });
