@@ -28,7 +28,7 @@
       </template>
     </a-table>
 
-    <a-modal :visible="info.visible" title="合同续签情况" :footer="false" draggable @cancel="handleCancel">
+    <a-modal :visible="info.visible" title="合同续签情况" :footer="false" draggable @cancel="handleFormCancel">
       <a-form ref="conlistFormRef" :model="conlist" @submit="formSubmit">
         <a-form-item field="id" tooltip="Please enter id" label="id" style="display: none">
           <a-input-number v-model="conlist.id" placeholder="please enter your id..." />
@@ -51,15 +51,15 @@
       </a-form>
     </a-modal>
 
-    <a-modal :visible="info.ht" fullscreen title="合同图片列表" :footer="false" @cancel="htCancel">
+    <a-modal :visible="info.ht" title="合同图片" fullscreen :footer="false" :unmount-on-close="true" :hide-title="true" @cancel="htCancel">
       <section class="ht">
         <div class="ht-left">
-          <a-upload ref="htuploadRef" :action="htUpload.action" :headers="htUpload.headers" list-type="picture" multiple :default-file-list="htImgs" @before-upload="beforeUp" />
+          <a-upload :action="htUpload.action" :headers="htUpload.headers" list-type="picture" multiple :default-file-list="htImgs" @before-upload="beforeUp" @before-remove="beforeRemove" />
         </div>
         <article class="ht-right">
-          <a-carousel auto-play :style="{ height: htUpload.height + 'px' }">
-            <a-carousel-item v-for="image in htImgs" :key="image.uid">
-              <img :src="image.url" :style="{ width: '100%' }" />
+          <a-carousel auto-play :style="{ position: 'fixed', top: '70px', right: '20px', width: '47%', bottom: '20px' }">
+            <a-carousel-item v-for="mg in htImgs" :key="mg.uid">
+              <img :src="mg.url" :style="{ width: '100%' }" />
             </a-carousel-item>
           </a-carousel>
         </article>
@@ -71,6 +71,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive } from 'vue';
 import { useRoute } from 'vue-router';
+import type { FileItem } from '@arco-design/web-vue';
 import { conLists, conListPostOrPut, conListDel } from '@/api/caiwu';
 import type { IConList } from '@/types/caiwu';
 import { tinyCanvas } from '@/utils/caiwu';
@@ -89,6 +90,7 @@ const conlistData = reactive<{ values: IConList[]; total: number }>({
   values: [],
   total: 0,
 });
+// 表单合同修改或新增
 const conlist = reactive<{
   contractId: number;
   id: number;
@@ -105,10 +107,9 @@ const conlist = reactive<{
   imgs: [],
 });
 const htImgs = ref<{ uid: string; name: string; url: string }[]>([]);
-const htuploadRef = ref();
 const htUpload = reactive({
-  height: 0,
   action: '',
+  conlistId: 0,
   headers: {
     Authorization: '',
   },
@@ -123,7 +124,6 @@ const getConList = async () => {
 onMounted(() => {
   conlist.contractId = +`${route.params.id}`;
   getConList();
-  htUpload.height = document.documentElement.clientHeight - 200;
   htUpload.headers.Authorization = getToken() || '';
 });
 // 表单编辑
@@ -138,8 +138,8 @@ const editFn = (record: any) => {
     desc: { value: record.desc },
   });
 };
-// model关闭后，重置
-const handleCancel = () => {
+// 表单model关闭后，重置
+const handleFormCancel = () => {
   info.visible = false;
   conlistFormRef.value.resetFields();
 };
@@ -151,25 +151,22 @@ const formSubmit = async ({ values, errors }: any) => {
   // values.contractId = conlist.contractId;
   await conListPostOrPut(values);
   getConList();
-  handleCancel();
+  handleFormCancel();
 };
+// 合同删除
 const delFn = async (id: number) => {
   await conListDel(id);
   getConList();
 };
-// 换页
+// 合同换页
 const pageChange = (num: number) => {
   info.page = num;
   getConList();
 };
-// 合同modal界面关闭
-const htCancel = () => {
-  htImgs.value.length = 0;
-  info.ht = false;
-};
-// 合同列表查看
+// 合同图片列表，打开查看
 const htBtn = (record: any) => {
-  htUpload.action = `${import.meta.env.VITE_API_BASE_URL}/api/conlist/upload/${record.id}`;
+  htUpload.action = `${import.meta.env.VITE_API_BASE_URL}/api/conlist/upfile/${record.id}`;
+  htUpload.conlistId = record.id;
   if (record.imgs) {
     const ret: { uid: string; name: string; url: string }[] = [];
     record.imgs.forEach((url: string) => {
@@ -182,8 +179,23 @@ const htBtn = (record: any) => {
 
   info.ht = true;
 };
+// 合同图片列表modal界面关闭
+const htCancel = () => {
+  htUpload.conlistId = 0;
+  htImgs.value.length = 0;
+  info.ht = false;
+  getConList();
+};
 // 图片上传前压缩图片
 const beforeUp = (file: File) => tinyCanvas(file);
+// 图片删除前
+const beforeRemove = (fileItem: FileItem) => {
+  // conListDel(htUpload.conlistId, fileItem.url);
+  const url: string = fileItem.response ? fileItem.response.data : fileItem.url;
+  const val = url.split('uploads/')[1];
+  conListDel(htUpload.conlistId, val);
+  return Promise.resolve(true);
+};
 </script>
 
 <style lang="less" scoped>
@@ -202,7 +214,9 @@ const beforeUp = (file: File) => tinyCanvas(file);
   }
 
   &-right {
+    position: relative;
     flex: 1;
+    width: 100%;
   }
 }
 </style>

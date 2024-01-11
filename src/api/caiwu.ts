@@ -47,4 +47,8 @@ export const conLists = <T>(cid: number, page = 1, size = 20) => http.get<T>(`/c
 export const conListPostOrPut = <T>(data: any) => {
   return data.id ? http.patch<T>(`/conlist/${data.id}`, data) : http.post<T>('/conlist', data);
 };
-export const conListDel = (id: number) => http.delete(`/conlist/${id}`);
+export const conListDel = (id: number, imgurl = '') => {
+  let url = `/conlist/${id}`;
+  if (imgurl) url += `?img=${imgurl}`;
+  return http.delete(url);
+};
